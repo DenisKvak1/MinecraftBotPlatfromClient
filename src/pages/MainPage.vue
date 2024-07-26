@@ -8,6 +8,7 @@ import {webSocketBotAPI} from "@/API/WS-BOT-API";
 import BotsList from "@/components/BotsList.vue";
 import {BotInfo} from "../../env/types";
 import {useRouter} from "vue-router";
+import CreateBotFeature from "@/features/CreateBotFeature.vue";
 
 const id = '18839b9b-5d21-4793-b175-3790dd7302ef'
 const {isConnect, isNotConnect, reconnect, onConnect} = useBackendConnect()
@@ -48,6 +49,7 @@ onMounted(() => {
 
 <template>
   <div>
+    <CreateBotFeature></CreateBotFeature>
     <BotsList
         @turn="async (data) => {
         const {action, id} = data;

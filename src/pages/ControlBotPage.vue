@@ -11,6 +11,8 @@ import ChatBotFeature from "@/features/ChatBotFeature.vue";
 import BotWalkBlock from "@/components/BotWalkBlock.vue";
 import BotWalkFeature from "@/features/BotWalkFeature.vue";
 import BotHeadFeature from "@/features/BotHeadFeature.vue";
+import FarmBotToggler from "@/features/FarmBotToggler.vue";
+import BotSwitcher from "@/features/BotSwitcher.vue";
 
 const {isLoad} = useLoadBotStore()
 const currentBotStore = useCurrentBotStore()
@@ -24,10 +26,11 @@ const {isValue: isLazyNotConnect} = useDelay(isNotConnect, false)
 <template>
   <div>
     <div v-if="isLoad" class="p-1.5 container">
-      <div class="flex justify-between">
+            <div class="flex justify-between">
         <BotHeadFeature :bot-i-d="currentBotStore.id"></BotHeadFeature>
         <BotWalkFeature :bot-i-d="currentBotStore.id"></BotWalkFeature>
       </div>
+      <FarmBotToggler :bot-i-d="currentBotStore.id"></FarmBotToggler>
       <ConnectBotSwitcher :bot-i-d="currentBotStore.id"></ConnectBotSwitcher>
       <div class="myContainer">
         <BotWindowFeature

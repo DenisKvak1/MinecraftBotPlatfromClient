@@ -7,13 +7,13 @@ import {webSocketBotAPI} from "@/API/WS-BOT-API";
 import {onMounted, ref} from "vue";
 import {useBackendConnect} from "@/proccess/useBackendConnect";
 
-const {onceConnect} = useBackendConnect()
+const {onConnect} = useBackendConnect()
 const props = defineProps<{
    botID: string,
 }>()
 const status = ref('')
 
-onceConnect(async()=>{
+onConnect(async()=>{
   status.value = (await webSocketBotAPI.getBot(props.botID)).data.account.status
 })
 

@@ -7,7 +7,7 @@ export enum BotStatus {
     DISCONNECT = "DISCONNECT",
 }
 
-type AccountModel = {
+export type AccountModel = {
     id: string
     nickname: string,
     server: string,
@@ -20,12 +20,18 @@ export type toggle = "START" | "STOP"
 
 export type MovementDirection = 'BACK' | 'FORWARD' | 'LEFT' | 'RIGHT'
 export type HeadRotateDirection = 'UP' | 'DOWN' | 'LEFT' | 'RIGHT'
+export type toggleInfo = 'ON' | 'OFF'
 
 export type OutgoingMessage<T = any> = {
     command: UNIVERSAL_COMMAND_LIST
     botID: string
     data?: T
 }
+export type OutgoingGetFarmState = OutgoingMessage
+
+export type IncomingGetFarmStatusMessage = IncomingReplayMessage<{
+    status: toggleInfo
+}>
 export type IncomingReplayMessage<T = any> = {
     command: UNIVERSAL_COMMAND_LIST
     botID: string
@@ -94,6 +100,11 @@ export type OutgoingGotoMessage = OutgoingMessage<{
     y: number,
     z: number
 }>
+export type IncomingBotFarmStatusMessage = {
+    command: INCOMING_COMMAND_LIST.FARM_ACTION,
+    id: string,
+    action: toggle
+}
 export type OutgoingClickWindowMessage = OutgoingMessage<{
     slotIndex: number
 }>
@@ -190,6 +201,7 @@ export enum UNIVERSAL_COMMAND_LIST {
     MOVEMENT_BOT = 'MOVEMENT_BOT',
     JUMP_BOT = 'JUMP_BOT',
     CLICK_WINDOW = 'CLICK_WINDOW',
+    GET_FARM_STATUS = 'GET_FARM_STATUS',
     GET_CURRENT_WINDOW = 'GET_CURRENT_WINDOW',
     GET_INVENTORY_SLOTS = 'GET_INVENTORY_SLOTS',
     ACTIVATE_SLOT = 'ACTIVATE_SLOT'
@@ -203,5 +215,6 @@ export enum INCOMING_COMMAND_LIST {
     LOAD_CAPTCHA = 'LOAD_CAPTCHA',
     INVENTORY_UPDATE = 'INVENTORY_UPDATE',
     // DAMAGE = 'DAMAGE',
+    FARM_ACTION = 'FARM_ACTION',
     DEATH = 'DEATH'
 }

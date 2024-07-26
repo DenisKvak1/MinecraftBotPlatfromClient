@@ -2,11 +2,11 @@ import {
     HeadRotateDirection,
     INCOMING_COMMAND_LIST,
     IncomingActionWindowBotMessage,
-    IncomingBotDeathMessage,
+    IncomingBotDeathMessage, IncomingBotFarmStatusMessage,
     IncomingCaptchaMessage,
     IncomingChatBotMessage,
     IncomingConnecingBotMessage,
-    IncomingCreateBotReplayMessage, IncomingGetCurrentWindowReplayMessage,
+    IncomingCreateBotReplayMessage, IncomingGetCurrentWindowReplayMessage, IncomingGetFarmStatusMessage,
     IncomingInventoryUpdateBotMessage,
     IncomingReplayMessage,
     MovementDirection,
@@ -39,6 +39,7 @@ import {
 } from "@/API/types";
 import {Command as command} from "@/components/ui/command";
 import {Item} from "../../env/types";
+import {UnfoldVerticalIcon} from "lucide-vue-next";
 
 type pos = {
     x: number,
@@ -79,6 +80,10 @@ type inventoryUpdateEvent = {
     index: number,
     item: Item
 }
+type farmEvent = {
+    id: string,
+    action: toggle
+}
 type deathEvent = {
     id: string,
 }
@@ -107,6 +112,8 @@ interface BOT_API {
     turnOffUseClicker(id: string): Promise<IncomingReplayMessage>
     turnOnFarm(id: string): Promise<IncomingReplayMessage>
     turnOffFarm(id: string): Promise<IncomingReplayMessage>
+
+    getFarmState(id: string): Promise<IncomingGetFarmStatusMessage>
 
     turnOnAutoFood(id: string): Promise<IncomingReplayMessage>
     turnOffAutoFood(id: string): Promise<IncomingReplayMessage>
@@ -155,6 +162,7 @@ export class WebsocketBotApi implements BOT_API{
     $inventoryUpdate =  new Observable<inventoryUpdateEvent>();
     $loadCaptcha =  new Observable<captchaEvent>();
     $window =  new Observable<openWindowEvent>();
+    $farm = new Observable<farmEvent>()
 
     constructor() {
         this.init()
@@ -168,6 +176,9 @@ export class WebsocketBotApi implements BOT_API{
 
     private initEventRoutes(){
         this.eventRoutes = {
+            [INCOMING_COMMAND_LIST.FARM_ACTION]: (message: IncomingBotFarmStatusMessage)=>{
+                this.onFarmAction(message.id, message.action)
+            },
             [INCOMING_COMMAND_LIST.CONNECTING_BOT]: (message: IncomingConnecingBotMessage)=> {
                 this.onStandartBotEvent(message.id, message.state)
             },
@@ -210,6 +221,9 @@ export class WebsocketBotApi implements BOT_API{
         if(myFunction) myFunction(message)
     }
 
+    private onFarmAction(id: string, action: toggle) {
+        this.$farm.next({id, action})
+    }
     private onChatMessage(id: string, message: string){
         this.$chatMessage.next({id, message});
     }
@@ -615,6 +629,16 @@ export class WebsocketBotApi implements BOT_API{
         })
 
         return this.replay(UNIVERSAL_COMMAND_LIST.GET_CURRENT_WINDOW, id)
+    }
+
+
+    getFarmState(id: string): Promise<IncomingGetFarmStatusMessage> {
+        this.send<OutgoingGetCurrentWindow>({
+            command: UNIVERSAL_COMMAND_LIST.GET_FARM_STATUS,
+            botID: id
+        })
+
+        return this.replay(UNIVERSAL_COMMAND_LIST.GET_FARM_STATUS)
     }
 
     wsReconnect(): Promise<boolean> {
