@@ -46,7 +46,7 @@ type pos = {
     y: number
     z: number
 }
-type createBotDTO = {
+export type createBotDTO = {
     nickname: string,
     server: string,
     port: number,

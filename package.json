@@ -20,6 +20,7 @@
     "tailwind-merge": "^2.4.0",
     "tailwindcss-animate": "^1.0.7",
     "typescript": "^5.5.4",
+    "vee-validate": "^4.13.2",
     "vue": "^3.4.29",
     "vue-router": "^4.4.0"
   },

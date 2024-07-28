@@ -1,23 +1,27 @@
 <script setup lang="ts">
-import BotWindow from "@/components/BotWindow.vue";
-import {ref, Ref} from "vue";
-import {Item} from "../../env/types";
-import {useLoadBot} from "@/proccess/useLoadBot";
-import {webSocketBotAPI} from "@/API/WS-BOT-API";
-import {STATUS} from "@/API/types";
+import BotWindow from '@/components/BotWindow.vue';
+import { computed, ref, Ref, watch } from 'vue';
+import { Item } from '../../env/types';
+import { useLoadBot } from '@/proccess/useLoadBot';
+import { webSocketBotAPI } from '@/API/WS-BOT-API';
+import { STATUS } from '@/API/types';
 
 const props = defineProps<{
-  botID: string
+	botID: string
 }>()
 
+const computedBotID = computed(()=> props.botID)
+const {isLoad, onConnectBot, onDisconnectBot} = useLoadBot(computedBotID)
 const slots: Ref<Item[]> = ref([])
-const {isLoad, onConnectBot, onDisconnectBot} = useLoadBot(props.botID)
 
-onConnectBot(async () => {
-  const response = await webSocketBotAPI.getCurrentWindow(props.botID)
-  if (response.status !== STATUS.SUCCESS) return
-  slots.value = response.data.slots
-})
+const initSlots = async () => {
+	const response = await webSocketBotAPI.getCurrentWindow(props.botID)
+	if (response.status !== STATUS.SUCCESS) return
+	slots.value = response.data.slots
+}
+
+onConnectBot(initSlots)
+watch(()=> props.botID, initSlots)
 
 onDisconnectBot(()=>{
   slots.value = []

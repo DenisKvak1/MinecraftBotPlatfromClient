@@ -46,8 +46,8 @@ function onTurn(){
           <DropdownMenuItem>
             <button>Настройки</button>
           </DropdownMenuItem>
-          <DropdownMenuItem>
-            <button @click="emit('delete')">Удалить</button>
+          <DropdownMenuItem  @click="emit('delete')" class="cursor-pointer">
+            <button>Удалить</button>
           </DropdownMenuItem>
         </DropdownMenuContent>
       </DropdownMenu>

@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import BotElement from "@/components/BotElement.vue";
-import { BotInfo } from "env/types";
 import BotElementSkeleton from "@/view/BotElementSkeleton.vue";
+import {BotInfo} from "../../env/types";
 
 const props = defineProps<{
   bots: BotInfo[],
@@ -9,8 +9,8 @@ const props = defineProps<{
 }>()
 const emit = defineEmits<{
   (e: 'turn', data: {id: string, action: 'CONNECT' | 'DISCONNECT'}): void,
-  (e: 'delete', id: string): void,
-  (e: 'select', nickname: string): void,
+  (e: 'delete', data: {id: string, nickname: string}): void,
+  (e: 'select', data: {id: string, nickname: string}): void,
 }>()
 </script>
 
@@ -19,9 +19,9 @@ const emit = defineEmits<{
   <BotElement
       v-if="!skeleton"
       v-for="bot in props.bots"
-      @click="emit('select', bot.nickname)"
+      @click="emit('select', {nickname: bot.nickname, id: bot.id})"
       @turn="(action)=> emit('turn', {id: bot.id, action})"
-      @delete="() => emit('delete', bot.id)"
+      @delete="() => emit('delete', {nickname: bot.nickname, id: bot.id})"
       :bot-info="bot"
   ></BotElement>
   <BotElementSkeleton v-else v-for="key in 10"></BotElementSkeleton>

@@ -1,24 +1,33 @@
 <script setup lang="ts">
-import SlotBar from "@/components/SlotBar.vue";
-import {Ref, ref} from "vue";
-import {Item} from "../../env/types";
-import {useLoadBot} from "@/proccess/useLoadBot";
-import {webSocketBotAPI} from "@/API/WS-BOT-API";
-import {STATUS} from "@/API/types";
+import SlotBar from '@/components/SlotBar.vue';
+import { computed, Ref, ref, watch } from 'vue';
+import { Item } from '../../env/types';
+import { useLoadBot } from '@/proccess/useLoadBot';
+import { webSocketBotAPI } from '@/API/WS-BOT-API';
+import { STATUS } from '@/API/types';
 
 const props = defineProps<{
   botID: string
 }>()
 
-const slots: Ref<Item[]> = ref([])
-const {isLoad, onConnectBot, onDisconnectBot} = useLoadBot(props.botID)
+const computedBotID = computed(()=> props.botID)
+const {isLoad, onSpawnBot, onDisconnectBot} = useLoadBot(computedBotID)
 
-onConnectBot(async () => {
-  const response = await webSocketBotAPI.getInventorySlots(props.botID);
-  if (response.status !== STATUS.SUCCESS) return
+const slots: Ref<Item[]> = ref([
+	null, null, null,
+	null, null, null,
+	null, null, null
+])
 
-  slots.value = response.data.slots.slice(36, 45)
-})
+const initSlots = async () => {
+	const response = await webSocketBotAPI.getInventorySlots(props.botID);
+	if (response.status !== STATUS.SUCCESS) return
+
+	slots.value = response.data.slots.slice(36, 45)
+}
+
+onSpawnBot(initSlots)
+watch(()=> props.botID, initSlots)
 
 onDisconnectBot(() => {
   slots.value = []

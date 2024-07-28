@@ -2,23 +2,19 @@ import {useCurrentBotStore} from "@/store/currentBotStore";
 import {useRoute, useRouter} from "vue-router";
 import {webSocketBotAPI} from "@/API/WS-BOT-API";
 import {STATUS} from "@/API/types";
-import {ref} from "vue";
+import { Ref, ref, watch } from 'vue';
 import {useBackendConnect} from "@/proccess/useBackendConnect";
 
 
 export const useLoadBotStore = ()=> {
     const route = useRoute()
     const router = useRouter()
-    const botName = route.params.botName as string
+    let botName = route.params.botName as string
     const {onceConnect} = useBackendConnect()
     const currentBotStore = useCurrentBotStore()
     const isLoad = ref(false)
 
-    if (!botName) {
-        router.push('/')
-        return {isLoad}
-    }
-    onceConnect(() => {
+    function load(){
         webSocketBotAPI.getBotByName(botName).then((botMessage) => {
             if (botMessage.status !== STATUS.SUCCESS) return router.push('/')
 
@@ -28,6 +24,19 @@ export const useLoadBotStore = ()=> {
             currentBotStore.setBotServer(botMessage.data.account.server)
             isLoad.value = true
         })
+    }
+
+    watch(()=> route.params.botName, (newValue: string)=>{
+        botName = newValue
+        load()
+    })
+
+    if (!botName) {
+        router.push('/')
+        return {isLoad}
+    }
+    onceConnect(() => {
+        load()
 
         webSocketBotAPI.$eventBot.subscribe((event)=>{
             if(event.state === "SPAWN") return
@@ -38,44 +47,67 @@ export const useLoadBotStore = ()=> {
     return {isLoad}
 }
 
-export const useLoadBot = (id: string) => {
+export const useLoadBot = (botID: Ref<string>) => {
     const { onceConnect } = useBackendConnect()
     const isLoad = ref(false)
 
     const connectCallbacks: Function[] = []
     const disconnectCallbacks: Function[] = []
+    const spawnCallbacks: Function[] = []
 
     const onConnectBot = (callback: Function) => {
         connectCallbacks.push(callback)
+    }
+
+    const onSpawnBot = (callback: Function) => {
+        spawnCallbacks.push(callback)
     }
 
     const onDisconnectBot = (callback: Function) => {
         disconnectCallbacks.push(callback)
     }
 
+    const fetchBotData = async () => {
+        const botMessage = await webSocketBotAPI.getBot(botID.value)
+        if (botMessage.data.account.status === "CONNECT") {
+            isLoad.value = true
+            connectCallbacks.forEach(callback => callback())
+            spawnCallbacks.forEach(callback => callback())
+        } else {
+            isLoad.value = false
+        }
+    }
+
+    const handleEvent = (event: any) => {
+        if (event.id !== botID.value) return
+
+        if (event.state === "CONNECT") {
+            isLoad.value = true
+            connectCallbacks.forEach(callback => callback())
+        }
+        if (event.state === "DISCONNECT") {
+            isLoad.value = false
+            disconnectCallbacks.forEach(callback => callback())
+        }
+
+        if (event.state === "SPAWN") {
+            spawnCallbacks.forEach(callback => callback())
+        }
+    }
+
+    // Выполняется при первоначальной установке
     onceConnect(() => {
-        webSocketBotAPI.getBot(id).then((botMessage) => {
-            if(botMessage.data.account.status === "CONNECT"){
-                isLoad.value = true
-                connectCallbacks.forEach((callback) => callback())
-            }
-        })
+        fetchBotData()
 
-        webSocketBotAPI.$eventBot.subscribe((event)=>{
-            if(event.state === "SPAWN") return
-            if(event.id !== id) return
-
-            if(event.state === "CONNECT"){
-                isLoad.value = true
-                connectCallbacks.forEach((callback) => callback())
-            }
-            if(event.state === "DISCONNECT"){
-                isLoad.value = false
-                disconnectCallbacks.forEach((callback) => callback())
-            }
-        })
+        // Подписка на события
+        webSocketBotAPI.$eventBot.subscribe(handleEvent)
     })
 
+    // Наблюдаем за изменением idRef
+    watch(botID, (newId) => {
+        // Обновляем данные при изменении idRef
+        fetchBotData()
+    })
 
-    return {isLoad, onConnectBot, onDisconnectBot}
+    return { isLoad, onConnectBot, onDisconnectBot, onSpawnBot, idRef: botID }
 }

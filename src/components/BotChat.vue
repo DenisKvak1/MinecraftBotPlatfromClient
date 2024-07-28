@@ -12,7 +12,8 @@ type Message = {
 }
 
 const props = defineProps<{
-  messages: Message[]
+  messages: Message[],
+	skeleton: boolean
 }>()
 const emit = defineEmits<{
   (e: 'sendMessage', data: string): void
@@ -42,6 +43,10 @@ function sendMessage(){
   </div>
   <div class="flex">
     <Input
+				:disabled="props.skeleton"
+				:class="{
+					'disabled': props.skeleton
+				}"
         @keydown="(e)=> {
           if (e.key === 'Enter') sendMessage()
         }"
@@ -65,6 +70,9 @@ function sendMessage(){
   @apply flex flex-col flex-grow p-6;
   height: 358px;
   overflow-y: auto;
+}
+.disabled {
+	background: rgba(208, 208, 208, 0.17);
 }
 .message {
 

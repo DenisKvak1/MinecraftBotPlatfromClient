@@ -1,11 +1,11 @@
 <script setup lang="ts">
 
-import {Button} from "@/components/ui/button";
-import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
-import {BotStatus} from "@/API/types";
-import {webSocketBotAPI} from "@/API/WS-BOT-API";
-import {onMounted, ref} from "vue";
-import {useBackendConnect} from "@/proccess/useBackendConnect";
+import { Button } from '@/components/ui/button';
+import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
+import { BotStatus } from '@/API/types';
+import { webSocketBotAPI } from '@/API/WS-BOT-API';
+import { ref, watch } from 'vue';
+import { useBackendConnect } from '@/proccess/useBackendConnect';
 
 const {onConnect} = useBackendConnect()
 const props = defineProps<{
@@ -13,9 +13,12 @@ const props = defineProps<{
 }>()
 const status = ref('')
 
-onConnect(async()=>{
-  status.value = (await webSocketBotAPI.getBot(props.botID)).data.account.status
-})
+const initToggle = async()=>{
+	status.value = (await webSocketBotAPI.getBot(props.botID)).data.account.status
+}
+
+onConnect(initToggle)
+watch(()=> props.botID, initToggle)
 
 webSocketBotAPI.$eventBot.subscribe((data) => {
   if (data.state === "SPAWN") return

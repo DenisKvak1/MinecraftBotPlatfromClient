@@ -1,29 +1,32 @@
 <script setup lang="ts">
-import {useBackendConnect} from "@/proccess/useBackendConnect";
-import {Ref, ref} from "vue";
-import {toggleInfo} from "@/API/types";
-import {webSocketBotAPI} from "@/API/WS-BOT-API";
-import {useLoadBot} from "@/proccess/useLoadBot";
-import {Button} from "@/components/ui/button";
+import { useBackendConnect } from '@/proccess/useBackendConnect';
+import { computed, Ref, ref, watch } from 'vue';
+import { toggleInfo } from '@/API/types';
+import { webSocketBotAPI } from '@/API/WS-BOT-API';
+import { useLoadBot } from '@/proccess/useLoadBot';
+import { Button } from '@/components/ui/button';
 
 const props = defineProps<{
-  botID: string,
+	botID: string
 }>()
 
+const computedBotID = computed(()=> props.botID)
+const {isLoad, onConnectBot, onDisconnectBot} = useLoadBot(computedBotID)
+
 const {onceConnect, onConnect} = useBackendConnect()
-const {isLoad, onConnectBot} = useLoadBot(props.botID)
 
 const status: Ref<toggleInfo> = ref('OFF')
 
-onceConnect(() => {
-  onConnectBot(async () => {
-    status.value = (await webSocketBotAPI.getFarmState(props.botID)).data.status
-  })
-})
 
-onConnect(async () => {
-  status.value = (await webSocketBotAPI.getFarmState(props.botID)).data.status
+const initToggle = async () => {
+	status.value = (await webSocketBotAPI.getFarmState(props.botID)).data.status
+}
+
+
+onConnect(() => {
+	onConnectBot(initToggle)
 })
+watch(()=> props.botID, initToggle)
 
 webSocketBotAPI.$farm.subscribe((data) => {
   if (data.id !== props.botID) return

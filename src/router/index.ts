@@ -9,7 +9,7 @@ const routes = [
         component: MainPage,
     },
     {
-        path: '/:botName',
+        path: '/bots/:botName',
         name: 'ControlBot',
         component: ControlBotPage
     }
