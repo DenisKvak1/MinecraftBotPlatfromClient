@@ -62,10 +62,14 @@ type mainEvent = {
     id: string,
     state: standartEvent
 }
-type openWindowEvent = {
+export type WindowEvent = {
     id: string,
-    action: "OPEN" | "CLOSE"
-    items?: (Item | null)[]
+    title?: string,
+    action: "OPEN" | "CLOSE" | "UPDATE"
+    items?: Item[]
+    slotIndex?: number,
+    oldItem?: Item
+    newItem?: Item
 }
 type chatMessageEvent = {
     id: string,
@@ -90,7 +94,7 @@ type deathEvent = {
 interface BOT_API {
     $ready: IObservable<boolean>
     $eventBot: IObservable<mainEvent>
-    $window: IObservable<openWindowEvent>
+    $window: IObservable<WindowEvent>
     $chatMessage: IObservable<chatMessageEvent>
     $loadCaptcha: IObservable<captchaEvent>
     $inventoryUpdate: IObservable<inventoryUpdateEvent>
@@ -161,7 +165,7 @@ export class WebsocketBotApi implements BOT_API{
     $eventBot =  new Observable<mainEvent>();
     $inventoryUpdate =  new Observable<inventoryUpdateEvent>();
     $loadCaptcha =  new Observable<captchaEvent>();
-    $window =  new Observable<openWindowEvent>();
+    $window =  new Observable<WindowEvent>();
     $farm = new Observable<farmEvent>()
 
     constructor() {
@@ -195,7 +199,7 @@ export class WebsocketBotApi implements BOT_API{
                 this.onLoadCaptcha(message.id, message.imageBuffer)
             },
             [INCOMING_COMMAND_LIST.WINDOW]: (message: IncomingActionWindowBotMessage)=> {
-                this.onWindowAction(message.id, message.action, message.items)
+                this.onWindowAction(message)
             },
         }
     }
@@ -244,8 +248,10 @@ export class WebsocketBotApi implements BOT_API{
         this.$loadCaptcha.next({id, imageBuffer})
     }
 
-    private onWindowAction(id: string, action: "OPEN" | "CLOSE", items?: Item[]){
-        this.$window.next({id, action, items})
+    private onWindowAction(message: IncomingActionWindowBotMessage){
+        this.$window.next({
+            ...message
+        })
     }
 
     private send<T = OutgoingMessage>(message: T){
