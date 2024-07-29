@@ -1,4 +1,5 @@
 import {Item} from "../../env/types";
+import { WindowEvent } from '@/API/WS-BOT-API';
 
 export type standartEvent = 'CONNECT' | 'DISCONNECT' | 'SPAWN'
 
@@ -138,11 +139,8 @@ export type IncomingConnecingBotMessage = {
     id: string,
     state: standartEvent
 }
-export type IncomingActionWindowBotMessage = {
+export type IncomingActionWindowBotMessage = WindowEvent & {
     command: INCOMING_COMMAND_LIST.WINDOW
-    id: string,
-    action: "OPEN" | "CLOSE"
-    items?: (Item | null)[]
 }
 export type IncomingChatBotMessage = {
     command: INCOMING_COMMAND_LIST.CHAT_MESSAGE
