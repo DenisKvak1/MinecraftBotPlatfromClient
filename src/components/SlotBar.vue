@@ -50,6 +50,7 @@ function dropItem(index: number, slot: Item) {
 						@contextmenu.prevent="dropItem(index, slot)"
 					>
 						<img v-if="slot" :src="`http://${BackendURL}/minecraftTextures/${slot.name}.png`" :alt="slot.name">
+						<span v-if="slot && slot?.count !== 1" class="count">{{ slot.count }}</span>
 					</button>
 				</TooltipTrigger>
 				<TooltipContent class="bg-gray-700" v-if="slot?.customLore || slot?.customName">
@@ -70,7 +71,7 @@ function dropItem(index: number, slot: Item) {
 
 <style scoped>
 .slot {
-	@apply w-[40px] h-[40px] border-t border-l border-b last:border-r p-1;
+	@apply w-[40px] h-[40px] border-t border-l border-b last:border-r p-1 relative;
 	@apply sm:w-[50px] sm:h-[50px];
 	@apply lg:border-t-2 lg:border-b-2 lg:border-l-2 last:lg:border-r-2;
 	@apply xl:w-[60px] xl:h-[60px];
@@ -82,5 +83,13 @@ function dropItem(index: number, slot: Item) {
 
 .selected {
 	@apply outline rounded outline-gray-300;
+}
+
+.count {
+	font-weight: 600;
+	position: absolute;
+	bottom: 0;
+	right: 0;
+	color: #cccccc;
 }
 </style>
