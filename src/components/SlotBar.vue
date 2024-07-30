@@ -54,7 +54,7 @@ function dropItem(index: number, slot: Item) {
 					</button>
 				</TooltipTrigger>
 				<TooltipContent class="bg-gray-700" v-if="slot?.customLore || slot?.customName">
-					<span v-if="!slot.customName && !slot.customLore"> {{ slot.displayName }}</span>
+					<span v-if="!slot.customName" class="text-white"> {{ slot.displayName }}</span>
 					<span v-html="slot.customName"></span>
 					<br>
 					<span v-html="slot.customLore"></span>
