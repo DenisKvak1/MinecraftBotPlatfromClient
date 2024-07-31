@@ -12,6 +12,7 @@ export type Item = {
     count: number,
     displayName: string,
 
-    customName?: string,
-    customLore?: string,
+    customName?: string
+    customNameHTML?: string,
+    customLoreHTML?: string,
 } | null;

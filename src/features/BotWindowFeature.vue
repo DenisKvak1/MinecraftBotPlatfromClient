@@ -17,6 +17,8 @@ const slots: Ref<Item[]> = ref([])
 const initSlots = async () => {
 	const response = await webSocketBotAPI.getCurrentWindow(props.botID)
 	if (response.status !== STATUS.SUCCESS) return
+	if (response.botID !== props.botID) return
+
 	slots.value = response.data.slots
 }
 
@@ -29,12 +31,13 @@ onDisconnectBot(()=>{
 
 webSocketBotAPI.$window.subscribe((data) => {
   if (data.id !== props.botID) return
+
   if (data.action === "OPEN") {
     slots.value = data.items
   }
-	if (data.action === "UPDATE") {
-		slots.value[data.slotIndex] = data.newItem
-	}
+	// if (data.action === "UPDATE") {
+	// 	slots.value[data.slotIndex] = data.newItem
+	// }
   if (data.action === "CLOSE") {
     slots.value = []
   }
