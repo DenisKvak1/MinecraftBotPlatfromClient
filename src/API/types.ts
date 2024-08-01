@@ -160,6 +160,16 @@ export type IncomingInventoryUpdateBotMessage = {
     index: number,
     item: Item | null
 }
+export type IncomingBotToggleAB = {
+    command: INCOMING_COMMAND_LIST.AB_ACTION
+    id: string,
+    action: toggle
+}
+export type IncomingGetABStatusMessage = IncomingReplayMessage<{
+    status: toggleInfo
+}>
+export type OutgoingGetABState = OutgoingMessage
+
 // export type IncomingChangePositionBotMessage = {
 //     command: INCOMING_COMMAND_LIST.POSITION_BOT
 //     id: string,
@@ -198,6 +208,8 @@ export enum UNIVERSAL_COMMAND_LIST {
     GOTO = 'GOTO',
     MOVEMENT_BOT = 'MOVEMENT_BOT',
     JUMP_BOT = 'JUMP_BOT',
+    GET_AB_STATUS = 'GET_AB_STATUS',
+    TOGGLE_AB = 'TOGGLE_AB',
     CLICK_WINDOW = 'CLICK_WINDOW',
     GET_FARM_STATUS = 'GET_FARM_STATUS',
     GET_CURRENT_WINDOW = 'GET_CURRENT_WINDOW',
@@ -213,6 +225,7 @@ export enum INCOMING_COMMAND_LIST {
     LOAD_CAPTCHA = 'LOAD_CAPTCHA',
     INVENTORY_UPDATE = 'INVENTORY_UPDATE',
     // DAMAGE = 'DAMAGE',
+    AB_ACTION = 'AB_ACTION',
     FARM_ACTION = 'FARM_ACTION',
     DEATH = 'DEATH'
 }

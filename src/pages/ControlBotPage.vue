@@ -12,7 +12,8 @@ import BotWalkFeature from '@/features/BotWalkFeature.vue';
 import BotHeadFeature from '@/features/BotHeadFeature.vue';
 import FarmBotToggler from '@/features/FarmBotToggler.vue';
 import BotSwitcher from '@/features/BotSwitcher.vue';
-import DropAllFeature from '@/features/DropAllFeature.vue';
+import ABFeature from '@/features/ABFeature.vue';
+import AutobuyToggle from '@/features/AutobuyToggle.vue';
 
 const { isLoad } = useLoadBotStore();
 const currentBotStore = useCurrentBotStore();
@@ -34,7 +35,8 @@ const { isValue: isLazyNotConnect } = useDelay(isNotConnect, false);
 				<BotHeadFeature class="headMove" :bot-i-d="currentBotStore.id"></BotHeadFeature>
 				<BotWalkFeature class="playerMove" :bot-i-d="currentBotStore.id"></BotWalkFeature>
 				<FarmBotToggler class="farmToggler" :bot-i-d="currentBotStore.id"></FarmBotToggler>
-				<DropAllFeature class="dropAll" :bot-i-d="currentBotStore.id"></DropAllFeature>
+<!--				<DropAllFeature class="AB" :bot-i-d="currentBotStore.id"></DropAllFeature>-->
+				<AutobuyToggle class="AB" :bot-i-d="currentBotStore.id"></AutobuyToggle>
 				<BotWindowFeature
 					:bot-i-d="currentBotStore.id"
 					class="bot-window"
@@ -140,7 +142,7 @@ const { isValue: isLazyNotConnect } = useDelay(isNotConnect, false);
 		margin-top: 60px;
 	}
 
-	.dropAll {
+	.AB {
 		grid-column: 1;
 		grid-row: 2;
 	}

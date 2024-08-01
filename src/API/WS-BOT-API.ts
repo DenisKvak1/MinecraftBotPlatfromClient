@@ -167,6 +167,7 @@ export class WebsocketBotApi implements BOT_API{
     $loadCaptcha =  new Observable<captchaEvent>();
     $window =  new Observable<WindowEvent>();
     $farm = new Observable<farmEvent>()
+    $ab = new Observable<farmEvent>()
 
     constructor() {
         this.init()
@@ -180,6 +181,9 @@ export class WebsocketBotApi implements BOT_API{
 
     private initEventRoutes(){
         this.eventRoutes = {
+            [INCOMING_COMMAND_LIST.AB_ACTION]: (message: IncomingBotFarmStatusMessage)=>{
+                this.onABAction(message.id, message.action)
+            },
             [INCOMING_COMMAND_LIST.FARM_ACTION]: (message: IncomingBotFarmStatusMessage)=>{
                 this.onFarmAction(message.id, message.action)
             },
@@ -228,6 +232,11 @@ export class WebsocketBotApi implements BOT_API{
     private onFarmAction(id: string, action: toggle) {
         this.$farm.next({id, action})
     }
+
+    private onABAction(id: string, action: toggle) {
+        this.$ab.next({id, action})
+    }
+
     private onChatMessage(id: string, message: string){
         this.$chatMessage.next({id, message});
     }
@@ -588,12 +597,41 @@ export class WebsocketBotApi implements BOT_API{
         return this.replay(UNIVERSAL_COMMAND_LIST.TOGGLE_FARM, id)
     }
 
+    private toggleAB(id: string, action: toggle): Promise<IncomingReplayMessage>{
+        this.send<OutgoingToggleFarmMessage>({
+            command: UNIVERSAL_COMMAND_LIST.TOGGLE_AB,
+            botID: id,
+            data: {
+                action,
+            }
+        })
+
+        return this.replay(UNIVERSAL_COMMAND_LIST.TOGGLE_FARM, id)
+    }
+
     turnOffFarm(id: string): Promise<IncomingReplayMessage> {
         return this.toggleFarm(id,  "STOP")
     }
 
     turnOnFarm(id: string): Promise<IncomingReplayMessage> {
         return this.toggleFarm(id,  "START")
+    }
+
+    turnOffAutoBuy(id: string): Promise<IncomingReplayMessage> {
+        return this.toggleAB(id,  "STOP")
+    }
+
+    turnOnAutoBuy(id: string): Promise<IncomingReplayMessage> {
+        return this.toggleAB(id,  "START")
+    }
+
+    getAutoBuyStatus(id: string){
+        this.send<OutgoingGetCurrentWindow>({
+            command: UNIVERSAL_COMMAND_LIST.GET_AB_STATUS,
+            botID: id
+        })
+
+        return this.replay(UNIVERSAL_COMMAND_LIST.GET_AB_STATUS)
     }
 
     updateBotOptions(id: string, dto: updateBotDTO): Promise<IncomingReplayMessage> {

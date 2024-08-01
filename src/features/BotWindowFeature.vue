@@ -35,9 +35,9 @@ webSocketBotAPI.$window.subscribe((data) => {
   if (data.action === "OPEN") {
     slots.value = data.items
   }
-	// if (data.action === "UPDATE") {
-	// 	slots.value[data.slotIndex] = data.newItem
-	// }
+	if (data.action === "UPDATE") {
+		slots.value[data.slotIndex] = data.newItem
+	}
   if (data.action === "CLOSE") {
     slots.value = []
   }
