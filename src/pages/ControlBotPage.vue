@@ -12,8 +12,15 @@ import BotWalkFeature from '@/features/BotWalkFeature.vue';
 import BotHeadFeature from '@/features/BotHeadFeature.vue';
 import FarmBotToggler from '@/features/FarmBotToggler.vue';
 import BotSwitcher from '@/features/BotSwitcher.vue';
-import ABFeature from '@/features/ABFeature.vue';
+import {
+	Tabs,
+	TabsContent,
+	TabsList,
+	TabsTrigger,
+} from '@/components/ui/tabs';
 import AutobuyToggle from '@/features/AutobuyToggle.vue';
+import BotInventoryFeature from '@/features/BotInventoryFeature.vue';
+import DropAllFeature from '@/features/DropAllFeature.vue';
 
 const { isLoad } = useLoadBotStore();
 const currentBotStore = useCurrentBotStore();
@@ -34,14 +41,34 @@ const { isValue: isLazyNotConnect } = useDelay(isNotConnect, false);
 			<div class="myContainer">
 				<BotHeadFeature class="headMove" :bot-i-d="currentBotStore.id"></BotHeadFeature>
 				<BotWalkFeature class="playerMove" :bot-i-d="currentBotStore.id"></BotWalkFeature>
-				<FarmBotToggler class="farmToggler" :bot-i-d="currentBotStore.id"></FarmBotToggler>
-<!--				<DropAllFeature class="AB" :bot-i-d="currentBotStore.id"></DropAllFeature>-->
+				<div class="flex flex-col gap-4">
+					<FarmBotToggler class="farmToggler" :bot-i-d="currentBotStore.id"></FarmBotToggler>
+					<DropAllFeature  :bot-i-d="currentBotStore.id"></DropAllFeature>
+				</div>
 				<AutobuyToggle class="AB" :bot-i-d="currentBotStore.id"></AutobuyToggle>
-				<BotWindowFeature
-					:bot-i-d="currentBotStore.id"
-					class="bot-window"
-				>
-				</BotWindowFeature>
+
+				<Tabs default-value="window" class="bot-window">
+					<TabsList class="grid w-full grid-cols-2">
+						<TabsTrigger value="window">
+							Текущие окно
+						</TabsTrigger>
+						<TabsTrigger value="inventory">
+							Инвентарь
+						</TabsTrigger>
+					</TabsList>
+					<TabsContent value="window">
+						<BotWindowFeature
+							:bot-i-d="currentBotStore.id"
+						>
+						</BotWindowFeature>
+
+					</TabsContent>
+					<TabsContent value="inventory">
+						<BotInventoryFeature
+							:bot-i-d="currentBotStore.id"
+						></BotInventoryFeature>
+					</TabsContent>
+				</Tabs>
 				<ChatBotFeature
 					:bot-i-d="currentBotStore.id"
 					class="bot-chat w-full sm:w-[360px]"
@@ -51,7 +78,6 @@ const { isValue: isLazyNotConnect } = useDelay(isNotConnect, false);
 					:bot-i-d="currentBotStore.id"
 				></HotbarFeature>
 			</div>
-
 		</div>
 		<LostConnection
 			:open="isLazyNotConnect"
@@ -63,7 +89,7 @@ const { isValue: isLazyNotConnect } = useDelay(isNotConnect, false);
 <style scoped>
 .myContainer {
 	display: grid;
-	grid-template-rows: repeat(5, auto);
+	grid-template-rows: repeat(6, auto);
 	grid-template-columns: repeat(2, auto);
 	justify-items: center;
 	row-gap: 10px;

@@ -36,7 +36,9 @@ const isConfirmDialogOpen = ref(false)
 	>
 		Бот выкинет все предметы из инвентаря.
 	</ConfirmationDialog>
-	<Button @click="onButtonClick">
+	<Button
+		@click="onButtonClick"
+		class="h-[50px] w-[50px] p-3.5">
 		<font-awesome-icon :icon="['fas', 'trash']" />
 	</Button>
 </div>

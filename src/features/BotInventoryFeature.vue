@@ -6,24 +6,26 @@ import { useLoadBot } from '@/proccess/useLoadBot';
 import { webSocketBotAPI } from '@/API/WS-BOT-API';
 import { STATUS } from '@/API/types';
 import { useWindow } from '@/hook/useWindow';
+import { useInventory } from '@/hook/useInventory';
+import SlotBar from '@/components/SlotBar.vue';
 
 const props = defineProps<{
 	botID: string
 }>()
 
 const computedBotID = computed(()=> props.botID)
-const {slots, clickWindow} = useWindow(computedBotID)
+const { isLoad } = useLoadBot(computedBotID);
+const {slots, dropItem} = useInventory(computedBotID)
 
 </script>
 
 <template>
-  <BotWindow
-		@drop-item="(index)=>clickWindow(index, 1)"
-    @click-window="(index)=> clickWindow(index, 0)"
-    :slots="slots"
-    :skeleton="slots.length === 0"
-  >
-  </BotWindow>
+	<BotWindow
+		@drop-item="dropItem"
+		:slots="slots"
+		:skeleton="!isLoad"
+	>
+	</BotWindow>
 </template>
 
 <style scoped>

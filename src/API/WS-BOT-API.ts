@@ -325,12 +325,13 @@ export class WebsocketBotApi implements BOT_API{
         return this.toggleMovement(id,  "STOP", "BACK")
     }
 
-    clickWindow(id: string, slotIndex: number): Promise<IncomingReplayMessage> {
+    clickWindow(id: string, slotIndex: number, mode: number = 0): Promise<IncomingReplayMessage> {
         this.send<OutgoingClickWindowMessage>({
             command: UNIVERSAL_COMMAND_LIST.CLICK_WINDOW,
             botID: id,
             data: {
-                slotIndex
+                slotIndex,
+                mode
             }
         })
 

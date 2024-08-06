@@ -108,6 +108,7 @@ export type IncomingBotFarmStatusMessage = {
 }
 export type OutgoingClickWindowMessage = OutgoingMessage<{
     slotIndex: number
+    mode: number
 }>
 export type OutgoingGetBotsMessage = OutgoingMessage
 export type OutgoingJumpBotMessage = OutgoingMessage

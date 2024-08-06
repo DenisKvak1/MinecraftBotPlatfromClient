@@ -17,7 +17,8 @@ const props = defineProps<{
 	skeleton?: boolean
 }>();
 const emit = defineEmits<{
-	(e: 'clickWindow', slotIndex: number): void
+	(e: 'clickWindow', slotIndex: number): void,
+	(e: 'dropItem', slotIndex: number): void
 }>();
 
 const row = computed(() => Math.ceil(props.slots.length / 9));
@@ -39,6 +40,13 @@ function clickWindow(colIndex: number, rowIndex: number, slot) {
 	emit('clickWindow', index);
 }
 
+function dropItem(colIndex: number, rowIndex: number, slot) {
+	if (!slot) return;
+	const index = (9 * colIndex) + rowIndex;
+	emit('dropItem', index);
+}
+
+
 </script>
 
 <template>
@@ -55,6 +63,7 @@ function clickWindow(colIndex: number, rowIndex: number, slot) {
                 'cursor-pointer': slot
               }"
 									@click="clickWindow(colIndex, rowIndex, slot)"
+									@contextmenu.prevent="dropItem(colIndex, rowIndex, slot)"
 								>
 									<div>
 										<img v-if="slot" :src="`http://${BackendURL}/minecraftTextures/${slot.name}.png`">
@@ -63,7 +72,7 @@ function clickWindow(colIndex: number, rowIndex: number, slot) {
 
 								</TableCell>
 							</TooltipTrigger>
-							<TooltipContent class="bg-gray-700" v-if="slot?.customLoreHTML || slot?.customNameHTML">
+							<TooltipContent class="bg-gray-700" v-if="slot?.customLoreHTML || slot?.customNameHTML || slot?.displayName">
 								<span v-if="!slot.customNameHTML"  class="text-white"> {{ slot.displayName }}</span>
 								<span v-html="slot.customNameHTML"></span>
 								<br>

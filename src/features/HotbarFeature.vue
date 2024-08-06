@@ -5,53 +5,15 @@ import { Item } from '../../env/types';
 import { useLoadBot } from '@/proccess/useLoadBot';
 import { webSocketBotAPI } from '@/API/WS-BOT-API';
 import { STATUS } from '@/API/types';
+import { useHotbar } from '@/hook/useHotbar';
 
 const props = defineProps<{
 	botID: string
 }>();
 
 const computedBotID = computed(() => props.botID);
-const { isLoad, onSpawnBot, onDisconnectBot } = useLoadBot(computedBotID);
-
-const slots: Ref<Item[]> = ref([
-	null, null, null,
-	null, null, null,
-	null, null, null,
-]);
-
-const initSlots = async () => {
-	const response = await webSocketBotAPI.getInventorySlots(props.botID);
-	if (response.status !== STATUS.SUCCESS) return;
-	if (response.botID !== props.botID) return
-
-		slots.value = response.data.slots.slice(36, 45);
-};
-
-
-onSpawnBot(initSlots);
-watch(() => props.botID, initSlots);
-
-onDisconnectBot(() => {
-	slots.value = [];
-});
-
-webSocketBotAPI.$inventoryUpdate.subscribe((data) => {
-	if (data.index <= 35 || data.index > 44) return;
-	if (data.id !== props.botID) return
-
-	const hotBarIndex = data.index - 36;
-	slots.value[hotBarIndex] = data.item;
-});
-
-function activateItem(slotIndex: number) {
-	webSocketBotAPI.activateSlot(props.botID, slotIndex).then((data) => {
-		console.log(data, slotIndex);
-	});
-}
-
-function dropItem(slotIndex: number) {
-	webSocketBotAPI.dropSlot(props.botID, slotIndex + 36);
-}
+const { isLoad } = useLoadBot(computedBotID);
+const {slots, activateItem, dropItem} = useHotbar(computedBotID);
 
 </script>
 
