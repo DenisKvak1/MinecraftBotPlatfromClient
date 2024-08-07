@@ -51,6 +51,7 @@ export type createBotDTO = {
     server: string,
     port: number,
     version: string,
+    whiteList?: string[]
 }
 type updateBotDTO = {
     profile?: string,

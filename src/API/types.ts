@@ -52,6 +52,7 @@ export type OutgoingCreateBotMessage = OutgoingMessage<{
     server: string,
     port: number,
     version: string,
+    whiteList?: string[]
 }>
 export type OutgoingDeleteBotMessage = OutgoingMessage
 export type OutgoingUpdateBotOptionsMessage = OutgoingMessage<{
