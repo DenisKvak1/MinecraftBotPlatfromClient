@@ -1,4 +1,4 @@
-import {Item} from "../../env/types";
+import { Item } from '../../env/types';
 import { WindowEvent } from '@/API/WS-BOT-API';
 
 export type standartEvent = 'CONNECT' | 'DISCONNECT' | 'SPAWN'
@@ -7,7 +7,13 @@ export enum BotStatus {
     CONNECT= "CONNECT",
     DISCONNECT = "DISCONNECT",
 }
-
+export enum BotFunctions {
+    AUTO_FARM = "AUTO_FARM",
+    AUTO_BUY = "AUTO_BUY",
+    AUTO_CLICKER_ATTACK = 'AUTO_CLICKER_ATTACK',
+    AUTO_CLICKER_USE = 'AUTO_CLICKER_USE',
+    AUTO_FOOD = 'AUTO_FOOD',
+}
 export type AccountModel = {
     id: string
     nickname: string,
@@ -28,11 +34,6 @@ export type OutgoingMessage<T = any> = {
     botID: string
     data?: T
 }
-export type OutgoingGetFarmState = OutgoingMessage
-
-export type IncomingGetFarmStatusMessage = IncomingReplayMessage<{
-    status: toggleInfo
-}>
 export type IncomingReplayMessage<T = any> = {
     command: UNIVERSAL_COMMAND_LIST
     botID: string
@@ -102,11 +103,6 @@ export type OutgoingGotoMessage = OutgoingMessage<{
     y: number,
     z: number
 }>
-export type IncomingBotFarmStatusMessage = {
-    command: INCOMING_COMMAND_LIST.FARM_ACTION,
-    id: string,
-    action: toggle
-}
 export type OutgoingClickWindowMessage = OutgoingMessage<{
     slotIndex: number
     mode: number
@@ -128,7 +124,11 @@ export type IncomingGetBotsInfoMessage = IncomingReplayMessage<{
 export type IncomingGetCurrentWindowReplayMessage = IncomingReplayMessage<{
     slots: (Item | null)[]
 }>
+export type IncomingGetBotFunctionStatusReplayMessage = IncomingReplayMessage<{
+    functionsStatus: Record<BotFunctions, toggleInfo>
+}>
 export type OutgoingGetCurrentWindow = OutgoingMessage
+export type OutgoingGetBotFunctionsStateMessage = OutgoingMessage
 
 export type OutgoingGetSlotsMessage = OutgoingMessage
 export type IncomingCaptchaMessage = {
@@ -162,14 +162,13 @@ export type IncomingInventoryUpdateBotMessage = {
     index: number,
     item: Item | null
 }
-export type IncomingBotToggleAB = {
-    command: INCOMING_COMMAND_LIST.AB_ACTION
+export type IncomingBotFunctionsStatusMessage = {
+    command: INCOMING_COMMAND_LIST.BOT_FUNCTIONS_ACTION,
     id: string,
+    type: BotFunctions
     action: toggle
 }
-export type IncomingGetABStatusMessage = IncomingReplayMessage<{
-    status: toggleInfo
-}>
+
 export type OutgoingGetABState = OutgoingMessage
 
 // export type IncomingChangePositionBotMessage = {
@@ -203,6 +202,8 @@ export enum UNIVERSAL_COMMAND_LIST {
     TOGGLE_CLICKER = 'TOGGLE_CLICKER',
     TOGGLE_FOOD = 'TOGGLE_FOOD',
     TOGGLE_FARM = 'TOGGLE_FARM',
+    TOGGLE_AB = 'TOGGLE_AB',
+    GET_BOT_FUNCTIONS_STATUS = 'GET_BOT_FUNCTIONS_STATUS',
     ROTATE_HEAD = 'ROTATE_HEAD',
     SET_HOTBAR_SLOT = 'SET_HOTBAR_SLOT',
     DROP_SLOT = 'DROP_SLOT',
@@ -210,12 +211,9 @@ export enum UNIVERSAL_COMMAND_LIST {
     GOTO = 'GOTO',
     MOVEMENT_BOT = 'MOVEMENT_BOT',
     JUMP_BOT = 'JUMP_BOT',
-    GET_AB_STATUS = 'GET_AB_STATUS',
-    TOGGLE_AB = 'TOGGLE_AB',
     CLICK_WINDOW = 'CLICK_WINDOW',
-    GET_FARM_STATUS = 'GET_FARM_STATUS',
-    GET_CURRENT_WINDOW = 'GET_CURRENT_WINDOW',
     GET_INVENTORY_SLOTS = 'GET_INVENTORY_SLOTS',
+    GET_CURRENT_WINDOW = 'GET_CURRENT_WINDOW',
     ACTIVATE_SLOT = 'ACTIVATE_SLOT'
 }
 
@@ -226,8 +224,7 @@ export enum INCOMING_COMMAND_LIST {
     // POSITION_BOT = 'POSITION_BOT',
     LOAD_CAPTCHA = 'LOAD_CAPTCHA',
     INVENTORY_UPDATE = 'INVENTORY_UPDATE',
+    BOT_FUNCTIONS_ACTION = 'BOT_FUNCTIONS_ACTION',
     // DAMAGE = 'DAMAGE',
-    AB_ACTION = 'AB_ACTION',
-    FARM_ACTION = 'FARM_ACTION',
     DEATH = 'DEATH'
 }

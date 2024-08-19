@@ -42,10 +42,10 @@ const { isValue: isLazyNotConnect } = useDelay(isNotConnect, false);
 				<BotHeadFeature class="headMove" :bot-i-d="currentBotStore.id"></BotHeadFeature>
 				<BotWalkFeature class="playerMove" :bot-i-d="currentBotStore.id"></BotWalkFeature>
 				<div class="flex flex-col gap-4">
-					<FarmBotToggler class="farmToggler" :bot-i-d="currentBotStore.id"></FarmBotToggler>
+					<FarmBotToggler class="farmToggler"></FarmBotToggler>
 					<DropAllFeature  :bot-i-d="currentBotStore.id"></DropAllFeature>
 				</div>
-				<AutobuyToggle class="AB" :bot-i-d="currentBotStore.id"></AutobuyToggle>
+				<AutobuyToggle class="AB"></AutobuyToggle>
 
 				<Tabs default-value="window" class="bot-window">
 					<TabsList class="grid w-full grid-cols-2">

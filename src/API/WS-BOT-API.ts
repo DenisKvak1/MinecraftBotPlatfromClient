@@ -1,12 +1,19 @@
 import {
+    BotFunctions,
     HeadRotateDirection,
     INCOMING_COMMAND_LIST,
     IncomingActionWindowBotMessage,
-    IncomingBotDeathMessage, IncomingBotFarmStatusMessage,
+    IncomingBotDeathMessage,
+    IncomingBotFunctionsStatusMessage,
     IncomingCaptchaMessage,
     IncomingChatBotMessage,
     IncomingConnecingBotMessage,
-    IncomingCreateBotReplayMessage, IncomingGetCurrentWindowReplayMessage, IncomingGetFarmStatusMessage,
+    IncomingCreateBotReplayMessage,
+    IncomingGetBotFunctionStatusReplayMessage,
+    IncomingGetBotInfoMessage,
+    IncomingGetBotsInfoMessage,
+    IncomingGetCurrentWindowReplayMessage,
+    IncomingGetSlotsReplayMessage,
     IncomingInventoryUpdateBotMessage,
     IncomingReplayMessage,
     MovementDirection,
@@ -18,28 +25,29 @@ import {
     OutgoingDeleteBotMessage,
     OutgoingDropAllSlotMessage,
     OutgoingDropSlotMessage,
+    OutgoingGetBotFunctionsStateMessage,
     OutgoingGetBotInfoIDMessage,
     OutgoingGetBotInfoNameMessage,
-    OutgoingGetBotsMessage, OutgoingGetCurrentWindow, OutgoingGetSlotsMessage,
+    OutgoingGetBotsMessage,
+    OutgoingGetCurrentWindow,
+    OutgoingGetSlotsMessage,
     OutgoingGotoMessage,
     OutgoingJumpBotMessage,
     OutgoingMessage,
+    OutgoingMovementBotMessage,
     OutgoingRotateHeadMessage,
     OutgoingSendChatMessageMessage,
     OutgoingSetHotBarSlotMessage,
-    OutgoingToggleClickerMessage, OutgoingToggleFarmMessage, OutgoingUpdateBotOptionsMessage, standartEvent, toggle,
-} from "@/API/types";
-import {IObservable, Observable} from "../../env/helpers/observable";
-import {BackendURL} from "../../env/config";
-import {
-    IncomingGetBotInfoMessage, IncomingGetBotsInfoMessage,
-    IncomingGetSlotsReplayMessage,
-    OutgoingMovementBotMessage,
-    UNIVERSAL_COMMAND_LIST
-} from "@/API/types";
-import {Command as command} from "@/components/ui/command";
-import {Item} from "../../env/types";
-import {UnfoldVerticalIcon} from "lucide-vue-next";
+    OutgoingToggleClickerMessage,
+    OutgoingToggleFarmMessage,
+    OutgoingUpdateBotOptionsMessage,
+    standartEvent,
+    toggle,
+    UNIVERSAL_COMMAND_LIST,
+} from '@/API/types';
+import { Observable } from '../../env/helpers/observable';
+import { BackendURL } from '../../env/config';
+import { Item } from '../../env/types';
 
 type pos = {
     x: number,
@@ -87,76 +95,14 @@ type inventoryUpdateEvent = {
 }
 type farmEvent = {
     id: string,
+    type: BotFunctions
     action: toggle
 }
 type deathEvent = {
     id: string,
 }
-interface BOT_API {
-    $ready: IObservable<boolean>
-    $eventBot: IObservable<mainEvent>
-    $window: IObservable<WindowEvent>
-    $chatMessage: IObservable<chatMessageEvent>
-    $loadCaptcha: IObservable<captchaEvent>
-    $inventoryUpdate: IObservable<inventoryUpdateEvent>
-    $death: IObservable<deathEvent>
 
-    createBot(dto: createBotDTO): Promise<IncomingCreateBotReplayMessage>
-    deleteBot(id: string): Promise<IncomingReplayMessage>
-    getBot(id: string): Promise<IncomingGetBotInfoMessage>
-    getBotByName(name: string): Promise<IncomingGetBotInfoMessage>
-    getAllBots(): Promise<IncomingGetBotsInfoMessage>
-    updateBotOptions(id: string, dto: updateBotDTO): Promise<IncomingReplayMessage>
-    turnOn(id: string): Promise<IncomingCreateBotReplayMessage>
-    turnOff(id: string): Promise<IncomingCreateBotReplayMessage>
-    sendChatMessage(id: string, message: string): Promise<IncomingReplayMessage>
-    attack(id: string): Promise<IncomingReplayMessage>
-    turnOnAttackClicker(id: string, interval: number): Promise<IncomingReplayMessage>
-    turnOffAttackClicker(id: string): Promise<IncomingReplayMessage>
-    turnOnUseClicker(id: string, interval: number): Promise<IncomingReplayMessage>
-    turnOffUseClicker(id: string): Promise<IncomingReplayMessage>
-    turnOnFarm(id: string): Promise<IncomingReplayMessage>
-    turnOffFarm(id: string): Promise<IncomingReplayMessage>
-
-    getFarmState(id: string): Promise<IncomingGetFarmStatusMessage>
-
-    turnOnAutoFood(id: string): Promise<IncomingReplayMessage>
-    turnOffAutoFood(id: string): Promise<IncomingReplayMessage>
-
-    startHeadUpRotate(id: string): Promise<IncomingReplayMessage>;
-    startHeadDownRotate(id: string): Promise<IncomingReplayMessage>;
-    startHeadRightRotate(id: string): Promise<IncomingReplayMessage>;
-    startHeadLeftRotate(id: string): Promise<IncomingReplayMessage>;
-
-    stopHeadRotateUp(id: string): Promise<IncomingReplayMessage>;
-    stopHeadRotateDown(id: string): Promise<IncomingReplayMessage>;
-    stopHeadRotateRight(id: string): Promise<IncomingReplayMessage>;
-    stopHeadRotateLeft(id: string): Promise<IncomingReplayMessage>;
-
-    setHotBarSlot(id: string, slotIndex: number): Promise<IncomingReplayMessage>;
-    dropSlot(id: string, slotIndex: number): Promise<IncomingReplayMessage>;
-    dropAllSlot(id: string): Promise<IncomingReplayMessage>;
-    goto(id: string, pos: pos): Promise<IncomingReplayMessage>;
-
-    forwardStart(id: string): Promise<IncomingReplayMessage>;
-    backwardStart(id: string): Promise<IncomingReplayMessage>;
-    leftStart(id: string): Promise<IncomingReplayMessage>;
-    rightStart(id: string): Promise<IncomingReplayMessage>;
-
-    forwardStop(id: string): Promise<IncomingReplayMessage>;
-    backwardStop(id: string): Promise<IncomingReplayMessage>;
-    leftStop(id: string): Promise<IncomingReplayMessage>;
-    rightStop(id: string): Promise<IncomingReplayMessage>;
-
-    jump(id: string): Promise<IncomingReplayMessage>;
-
-    clickWindow(id: string, slotIndex:number): Promise<IncomingReplayMessage>;
-    getCurrentWindow(id:string): Promise<IncomingGetCurrentWindowReplayMessage>
-    getInventorySlots(id: string): Promise<IncomingGetSlotsReplayMessage>;
-    activateSlot(id: string, slotIndex: number): Promise<IncomingReplayMessage>;
-}
-
-export class WebsocketBotApi implements BOT_API{
+export class WebsocketBotApi {
     private webSocket:WebSocket
     private eventRoutes: Record<INCOMING_COMMAND_LIST, Function>
     private $message =  new Observable<IncomingReplayMessage>()
@@ -167,8 +113,7 @@ export class WebsocketBotApi implements BOT_API{
     $inventoryUpdate =  new Observable<inventoryUpdateEvent>();
     $loadCaptcha =  new Observable<captchaEvent>();
     $window =  new Observable<WindowEvent>();
-    $farm = new Observable<farmEvent>()
-    $ab = new Observable<farmEvent>()
+    $functionsEvent = new Observable<farmEvent>()
 
     constructor() {
         this.init()
@@ -182,11 +127,8 @@ export class WebsocketBotApi implements BOT_API{
 
     private initEventRoutes(){
         this.eventRoutes = {
-            [INCOMING_COMMAND_LIST.AB_ACTION]: (message: IncomingBotFarmStatusMessage)=>{
-                this.onABAction(message.id, message.action)
-            },
-            [INCOMING_COMMAND_LIST.FARM_ACTION]: (message: IncomingBotFarmStatusMessage)=>{
-                this.onFarmAction(message.id, message.action)
+            [INCOMING_COMMAND_LIST.BOT_FUNCTIONS_ACTION]: (message: IncomingBotFunctionsStatusMessage)=>{
+                this.onBotFunctionsAction(message)
             },
             [INCOMING_COMMAND_LIST.CONNECTING_BOT]: (message: IncomingConnecingBotMessage)=> {
                 this.onStandartBotEvent(message.id, message.state)
@@ -230,12 +172,19 @@ export class WebsocketBotApi implements BOT_API{
         if(myFunction) myFunction(message)
     }
 
-    private onFarmAction(id: string, action: toggle) {
-        this.$farm.next({id, action})
-    }
 
-    private onABAction(id: string, action: toggle) {
-        this.$ab.next({id, action})
+    private onBotFunctionsAction(message: IncomingBotFunctionsStatusMessage){
+        switch (message.type) {
+            case BotFunctions.AUTO_BUY: {
+                this.$functionsEvent.next({id: message.id, type: BotFunctions.AUTO_BUY, action: message.action})
+                break;
+            }
+
+            case BotFunctions.AUTO_FARM: {
+                this.$functionsEvent.next({id: message.id, type: BotFunctions.AUTO_FARM, action: message.action})
+                break;
+            }
+        }
     }
 
     private onChatMessage(id: string, message: string){
@@ -627,13 +576,13 @@ export class WebsocketBotApi implements BOT_API{
         return this.toggleAB(id,  "START")
     }
 
-    getAutoBuyStatus(id: string){
-        this.send<OutgoingGetCurrentWindow>({
-            command: UNIVERSAL_COMMAND_LIST.GET_AB_STATUS,
+    getFunctionsStatus(id: string): Promise<IncomingGetBotFunctionStatusReplayMessage>{
+        this.send<OutgoingGetBotFunctionsStateMessage>({
+            command: UNIVERSAL_COMMAND_LIST.GET_BOT_FUNCTIONS_STATUS,
             botID: id
         })
 
-        return this.replay(UNIVERSAL_COMMAND_LIST.GET_AB_STATUS)
+        return this.replay(UNIVERSAL_COMMAND_LIST.GET_BOT_FUNCTIONS_STATUS)
     }
 
     updateBotOptions(id: string, dto: updateBotDTO): Promise<IncomingReplayMessage> {
@@ -677,15 +626,6 @@ export class WebsocketBotApi implements BOT_API{
         return this.replay(UNIVERSAL_COMMAND_LIST.GET_CURRENT_WINDOW, id)
     }
 
-
-    getFarmState(id: string): Promise<IncomingGetFarmStatusMessage> {
-        this.send<OutgoingGetCurrentWindow>({
-            command: UNIVERSAL_COMMAND_LIST.GET_FARM_STATUS,
-            botID: id
-        })
-
-        return this.replay(UNIVERSAL_COMMAND_LIST.GET_FARM_STATUS)
-    }
 
     wsReconnect(): Promise<boolean> {
         this.webSocket.close();

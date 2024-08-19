@@ -1,16 +1,14 @@
 <script setup lang="ts">
 import { useBackendConnect } from '@/proccess/useBackendConnect';
-import { computed, Ref, ref, watch } from 'vue';
-import { toggleInfo } from '@/API/types';
+import { computed, onUnmounted, Ref, ref, watch } from 'vue';
+import { BotFunctions, toggleInfo } from '@/API/types';
 import { webSocketBotAPI } from '@/API/WS-BOT-API';
 import { useLoadBot } from '@/proccess/useLoadBot';
 import { Button } from '@/components/ui/button';
+import { useCurrentBotStore } from '@/store/currentBotStore';
 
-const props = defineProps<{
-	botID: string
-}>()
-
-const computedBotID = computed(()=> props.botID)
+const currentBotStore = useCurrentBotStore();
+const computedBotID = computed(()=> currentBotStore.id)
 const {isLoad, onConnectBot, onDisconnectBot} = useLoadBot(computedBotID)
 
 const {onceConnect, onConnect} = useBackendConnect()
@@ -19,17 +17,18 @@ const status: Ref<toggleInfo> = ref('OFF')
 
 
 const initToggle = async () => {
-	status.value = (await webSocketBotAPI.getAutoBuyStatus(props.botID)).data.status
+	status.value = currentBotStore.functions.AUTO_BUY
 }
 
 
 onConnect(() => {
 	onConnectBot(initToggle)
 })
-watch(()=> props.botID, initToggle)
+watch(()=> currentBotStore.id, initToggle)
 
-webSocketBotAPI.$ab.subscribe((data) => {
-	if (data.id !== props.botID) return
+const subscribe = webSocketBotAPI.$functionsEvent.subscribe((data) => {
+	if (data.id !== computedBotID.value) return
+	if (data.type !== BotFunctions.AUTO_BUY) return
 
 	switch (data.action) {
 		case "START":
@@ -41,13 +40,16 @@ webSocketBotAPI.$ab.subscribe((data) => {
 	}
 })
 
+
+onUnmounted(()=> subscribe.unsubscribe())
+
 function toggleAB() {
 	switch (status.value) {
 		case "ON":
-			webSocketBotAPI.turnOffAutoBuy(props.botID)
+			webSocketBotAPI.turnOffAutoBuy(computedBotID.value)
 			break
 		case "OFF":
-			webSocketBotAPI.turnOnAutoBuy(props.botID)
+			webSocketBotAPI.turnOnAutoBuy(computedBotID.value)
 			break
 	}
 }

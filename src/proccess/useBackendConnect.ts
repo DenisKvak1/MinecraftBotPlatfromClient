@@ -1,11 +1,12 @@
 import {webSocketBotAPI} from "@/API/WS-BOT-API";
 import {computed, onUnmounted, ref} from "vue";
+import { Subscribe } from '../../env/helpers/observable';
 
 export function useBackendConnect() {
     const isConnect = ref(false)
     const isNotConnect = computed(() => !isConnect.value)
     const isReady = webSocketBotAPI.$ready.getValue()
-    const collector = []
+    const collector:Subscribe[] = []
 
     const reconnect = async () => {
         isConnect.value = await webSocketBotAPI.wsReconnect()

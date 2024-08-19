@@ -4,7 +4,7 @@ import { Button } from '@/components/ui/button';
 import { FontAwesomeIcon } from '@fortawesome/vue-fontawesome';
 import { BotStatus } from '@/API/types';
 import { webSocketBotAPI } from '@/API/WS-BOT-API';
-import { ref, watch } from 'vue';
+import { onUnmounted, ref, watch } from 'vue';
 import { useBackendConnect } from '@/proccess/useBackendConnect';
 
 const { onConnect } = useBackendConnect();
@@ -20,7 +20,7 @@ const initToggle = async () => {
 onConnect(initToggle);
 watch(() => props.botID, initToggle);
 
-webSocketBotAPI.$eventBot.subscribe((data) => {
+const subscribe = webSocketBotAPI.$eventBot.subscribe((data) => {
 	if (data.id !== props.botID) return;
 	if (data.state === 'SPAWN') return;
 	status.value = data.state as any;
@@ -34,6 +34,8 @@ function onTurn() {
 		webSocketBotAPI.turnOn(props.botID);
 	}
 }
+
+onUnmounted(()=> subscribe.unsubscribe())
 
 </script>
 

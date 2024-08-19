@@ -87,7 +87,7 @@ function onTurn(){
 }
 .nickname {
   @apply font-medium text-xl;
-  @apply 2xl:text-3xl;
+  @apply 2xl:text-[25px];
 }
 .info {
   @apply mt-2 self-start flex flex-col;

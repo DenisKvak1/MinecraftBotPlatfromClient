@@ -1,9 +1,11 @@
 import {useCurrentBotStore} from "@/store/currentBotStore";
 import {useRoute, useRouter} from "vue-router";
 import {webSocketBotAPI} from "@/API/WS-BOT-API";
-import {STATUS} from "@/API/types";
-import { Ref, ref, watch } from 'vue';
+import { STATUS, toggleInfo } from '@/API/types';
+import { onUnmounted, Ref, ref, watch } from 'vue';
 import {useBackendConnect} from "@/proccess/useBackendConnect";
+import { ToggleToToggleInfo } from '../../env/helpers/toggleToToggleInfo';
+import { Subscribe } from '../../env/helpers/observable';
 
 
 export const useLoadBotStore = ()=> {
@@ -13,17 +15,20 @@ export const useLoadBotStore = ()=> {
     const {onceConnect} = useBackendConnect()
     const currentBotStore = useCurrentBotStore()
     const isLoad = ref(false)
+    const subscribes:Subscribe[] = []
 
-    function load(){
-        webSocketBotAPI.getBotByName(botName).then((botMessage) => {
-            if (botMessage.status !== STATUS.SUCCESS) return router.push('/')
+    async function load(){
+        const botInfoMessage = await webSocketBotAPI.getBotByName(botName)
+        if (botInfoMessage.status !== STATUS.SUCCESS) return router.push('/')
 
-            currentBotStore.setID(botMessage.data.account.id)
-            currentBotStore.setName(botName)
-            currentBotStore.setBotState(botMessage.data.account.status)
-            currentBotStore.setBotServer(botMessage.data.account.server)
-            isLoad.value = true
-        })
+        const botFunctionsMessage = await webSocketBotAPI.getFunctionsStatus(botInfoMessage.data.account.id)
+
+        currentBotStore.setID(botInfoMessage.data.account.id)
+        currentBotStore.setName(botName)
+        currentBotStore.setBotState(botInfoMessage.data.account.status)
+        currentBotStore.setBotServer(botInfoMessage.data.account.server)
+        currentBotStore.setFunctions(botFunctionsMessage.data.functionsStatus)
+        isLoad.value = true
     }
 
     watch(()=> route.params.botName, (newValue: string)=>{
@@ -38,11 +43,18 @@ export const useLoadBotStore = ()=> {
     onceConnect(() => {
         load()
 
-        webSocketBotAPI.$eventBot.subscribe((event)=>{
+        subscribes.push(webSocketBotAPI.$eventBot.subscribe((event)=>{
             if(event.state === "SPAWN") return
             if(event.id !== currentBotStore.id) return
             currentBotStore.setBotState(event.state as any)
-        })
+        }))
+
+        subscribes.push(webSocketBotAPI.$functionsEvent.subscribe((event)=>{
+            currentBotStore.setFunction(event.type, ToggleToToggleInfo(event.action))
+        }))
+    })
+    onUnmounted(()=>{
+        subscribes.forEach((subs)=>subs.unsubscribe())
     })
     return {isLoad}
 }
@@ -50,6 +62,8 @@ export const useLoadBotStore = ()=> {
 export const useLoadBot = (botID: Ref<string>) => {
     const { onceConnect } = useBackendConnect()
     const isLoad = ref(false)
+
+    const subscribes:Subscribe[] = []
 
     const connectCallbacks: Function[] = []
     const disconnectCallbacks: Function[] = []
@@ -100,7 +114,7 @@ export const useLoadBot = (botID: Ref<string>) => {
         fetchBotData()
 
         // Подписка на события
-        webSocketBotAPI.$eventBot.subscribe(handleEvent)
+        subscribes.push(webSocketBotAPI.$eventBot.subscribe(handleEvent))
     })
 
     // Наблюдаем за изменением idRef
@@ -109,5 +123,8 @@ export const useLoadBot = (botID: Ref<string>) => {
         fetchBotData()
     })
 
+    onUnmounted(()=>{
+        subscribes.forEach((subs)=>subs.unsubscribe())
+    })
     return { isLoad, onConnectBot, onDisconnectBot, onSpawnBot, idRef: botID }
 }

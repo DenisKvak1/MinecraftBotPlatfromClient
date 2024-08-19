@@ -1,13 +1,14 @@
 <script setup lang="ts">
 import { webSocketBotAPI } from '@/API/WS-BOT-API';
 import BotsList from '@/components/BotsList.vue';
-import { onMounted, reactive, Reactive, Ref, ref } from 'vue';
+import { onMounted, onUnmounted, reactive, Reactive, Ref, ref } from 'vue';
 import ConfirmationDialog from '@/components/ConfirmationDialog.vue';
 import { useRouter } from 'vue-router';
 import { useBackendConnect } from '@/proccess/useBackendConnect';
 import { BotInfo } from '../../env/types';
 import CreateBotFeature from '@/features/CreateBotFeature.vue';
 import { useDelay } from '@/hook/useDelay';
+import { Subscribe } from '../../env/helpers/observable';
 
 const router = useRouter()
 const {isConnect, isNotConnect, reconnect, onConnect} = useBackendConnect()
@@ -15,19 +16,22 @@ const {isValue: isLazyNotConnect} = useDelay(isNotConnect, false)
 
 
 const botsInfo: Ref<BotInfo[]> = ref([])
+let subscribe:Subscribe
 onMounted(() => {
 	onConnect(async () => {
 		const response = await webSocketBotAPI.getAllBots()
 		botsInfo.value = response.data.accounts
 	})
 
-	webSocketBotAPI.$eventBot.subscribe((data) => {
+	subscribe = webSocketBotAPI.$eventBot.subscribe((data) => {
 		if (data.state === "SPAWN") return
 		const index = botsInfo.value.findIndex((info) => info.id === data.id)
 		if(!botsInfo.value[index]) return
 		botsInfo.value[index].status = data.state as any
 	})
 })
+
+onUnmounted(()=> subscribe.unsubscribe())
 
 const confirmDialogDeleteBot = ref(false)
 const currentDeletedBotInfo:Reactive<{

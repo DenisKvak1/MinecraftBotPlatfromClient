@@ -1,4 +1,4 @@
-import { ref, Ref, watch } from 'vue';
+import { onUnmounted, ref, Ref, watch } from 'vue';
 import { useLoadBot } from '@/proccess/useLoadBot';
 import { Item } from '../../env/types';
 import { webSocketBotAPI } from '@/API/WS-BOT-API';
@@ -23,7 +23,7 @@ export const useWindow = (botID: Ref<string>) => {
 		slots.value = [];
 	});
 
-	webSocketBotAPI.$window.subscribe((data) => {
+	const subscribe = webSocketBotAPI.$window.subscribe((data) => {
 		if (data.id !== botID.value) return;
 
 		if (data.action === 'OPEN') {
@@ -41,5 +41,6 @@ export const useWindow = (botID: Ref<string>) => {
 		webSocketBotAPI.clickWindow(botID.value, slotIndex, mouse);
 	};
 
-	return {clickWindow, slots};
+	onUnmounted(() => subscribe.unsubscribe());
+	return { clickWindow, slots };
 };

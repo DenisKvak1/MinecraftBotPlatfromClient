@@ -1,8 +1,9 @@
 <script setup lang="ts">
 import BotChat from "@/components/BotChat.vue";
-import { computed, Ref, ref, watch } from 'vue';
+import { computed, onUnmounted, Ref, ref, watch } from 'vue';
 import {webSocketBotAPI} from "@/API/WS-BOT-API";
 import { useLoadBot } from '@/proccess/useLoadBot';
+import { Subscribe } from '../../env/helpers/observable';
 
 type Message = {
   message?: string;
@@ -16,22 +17,23 @@ const props = defineProps<{
 const computedBotID = computed(()=> props.botID)
 const {isLoad} = useLoadBot(computedBotID)
 
-
 const messages: Ref<Message[]> = ref([])
+const subscribes:Subscribe[] = []
 
-webSocketBotAPI.$chatMessage.subscribe((data) => {
-  if (data.id !== props.botID) return
-  messages.value.push({
-    message: data.message,
-  })
-})
 
-webSocketBotAPI.$loadCaptcha.subscribe((data) => {
-  if (data.id !== props.botID) return
-  messages.value.push({
-    photo: data.imageBuffer,
-  })
-})
+subscribes.push(webSocketBotAPI.$chatMessage.subscribe((data) => {
+	if (data.id !== props.botID) return
+	messages.value.push({
+		message: data.message,
+	})
+}))
+
+subscribes.push(webSocketBotAPI.$loadCaptcha.subscribe((data) => {
+	if (data.id !== props.botID) return
+	messages.value.push({
+		photo: data.imageBuffer,
+	})
+}))
 
 watch(()=> props.botID, ()=>{
 	messages.value = []
@@ -41,6 +43,11 @@ function sendMessage(message: string) {
   webSocketBotAPI.sendChatMessage(props.botID, message)
 }
 
+onUnmounted(()=>{
+	subscribes.forEach((subscribe:Subscribe) => {
+		subscribe.unsubscribe()
+	})
+})
 </script>
 
 <template>

@@ -1,64 +1,65 @@
 <script setup lang="ts">
 import { useBackendConnect } from '@/proccess/useBackendConnect';
-import { computed, Ref, ref, watch } from 'vue';
-import { toggleInfo } from '@/API/types';
+import { computed, onUnmounted, Ref, ref, watch } from 'vue';
+import { BotFunctions, toggleInfo } from '@/API/types';
 import { webSocketBotAPI } from '@/API/WS-BOT-API';
 import { useLoadBot } from '@/proccess/useLoadBot';
 import { Button } from '@/components/ui/button';
+import { useCurrentBotStore } from '@/store/currentBotStore';
 
-const props = defineProps<{
-	botID: string
-}>()
+const currentBotStore = useCurrentBotStore();
+const computedBotID = computed(() => currentBotStore.id);
+const { isLoad, onConnectBot, onDisconnectBot } = useLoadBot(computedBotID);
 
-const computedBotID = computed(()=> props.botID)
-const {isLoad, onConnectBot, onDisconnectBot} = useLoadBot(computedBotID)
+const { onceConnect, onConnect } = useBackendConnect();
 
-const {onceConnect, onConnect} = useBackendConnect()
-
-const status: Ref<toggleInfo> = ref('OFF')
+const farmStatus: Ref<toggleInfo> = ref('OFF');
 
 
 const initToggle = async () => {
-	status.value = (await webSocketBotAPI.getFarmState(props.botID)).data.status
-}
+	farmStatus.value = currentBotStore.functions.AUTO_FARM;
+};
 
 
 onConnect(() => {
-	onConnectBot(initToggle)
+	onConnectBot(initToggle);
+});
+watch(() => currentBotStore.id, initToggle);
+
+const subscribe = webSocketBotAPI.$functionsEvent.subscribe((data) => {
+	if (data.id !== computedBotID.value) return;
+	if (data.type !== BotFunctions.AUTO_FARM) return;
+
+	switch (data.action) {
+		case 'START':
+			farmStatus.value = 'ON';
+			break;
+		case 'STOP':
+			farmStatus.value = 'OFF';
+			break;
+	}
+});
+onUnmounted(()=>{
+	subscribe.unsubscribe()
 })
-watch(()=> props.botID, initToggle)
-
-webSocketBotAPI.$farm.subscribe((data) => {
-  if (data.id !== props.botID) return
-
-  switch (data.action) {
-    case "START":
-      status.value = "ON"
-      break
-    case "STOP":
-      status.value = "OFF"
-      break
-  }
-})
-
 function toggleFarm() {
-  switch (status.value) {
-    case "ON":
-      webSocketBotAPI.turnOffFarm(props.botID)
-      break
-    case "OFF":
-      webSocketBotAPI.turnOnFarm(props.botID)
-      break
-  }
+	switch (farmStatus.value) {
+		case 'ON':
+			webSocketBotAPI.turnOffFarm(computedBotID.value);
+			break;
+		case 'OFF':
+			webSocketBotAPI.turnOnFarm(computedBotID.value);
+			break;
+	}
 }
 </script>
 
 <template>
   <Button
       @click="toggleFarm"
-      :class="{
-      'on': status === 'OFF',
-      'off': status === 'ON'
+			:class="{
+      'on': farmStatus === 'OFF',
+      'off': farmStatus === 'ON'
     }"
       class="h-[50px] w-[50px] p-3.5"
   >

@@ -1,4 +1,4 @@
-import { ref, Ref, watch } from 'vue';
+import { onUnmounted, ref, Ref, watch } from 'vue';
 import { useLoadBot } from '@/proccess/useLoadBot';
 import { Item } from '../../env/types';
 import { webSocketBotAPI } from '@/API/WS-BOT-API';
@@ -28,7 +28,7 @@ export const useInventory = (botID: Ref<string>) => {
 		slots.value = [];
 	});
 
-	webSocketBotAPI.$inventoryUpdate.subscribe((data) => {
+	const subscribe = webSocketBotAPI.$inventoryUpdate.subscribe((data) => {
 		if (data.index > 35 && data.index <= 44) return;
 		if (data.id !== botID.value) return;
 
@@ -39,6 +39,8 @@ export const useInventory = (botID: Ref<string>) => {
 	const dropItem = (slotIndex: number) => {
 		webSocketBotAPI.dropSlot(botID.value, slotIndex);
 	};
+
+	onUnmounted(()=> subscribe.unsubscribe());
 
 	return { slots, dropItem };
 }

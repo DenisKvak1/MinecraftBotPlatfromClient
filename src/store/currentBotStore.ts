@@ -1,18 +1,26 @@
 import {defineStore} from "pinia";
-import { BotStatus} from "@/API/types";
+import { BotFunctions, BotStatus, toggleInfo } from '@/API/types';
 
 type state = {
     id: string,
     name: string,
     state: BotStatus,
-    server: string
+    server: string,
+    functions: Record<BotFunctions, toggleInfo>
 };
 export const useCurrentBotStore = defineStore('currentBot', {
     state: (): state => ({
         id: '',
         name: '',
         state: BotStatus.DISCONNECT,
-        server: ''
+        server: '',
+        functions: {
+            AUTO_FARM: 'OFF',
+            AUTO_BUY: 'OFF',
+            AUTO_CLICKER_ATTACK: 'OFF',
+            AUTO_CLICKER_USE: 'OFF',
+            AUTO_FOOD: 'OFF',
+        }
     }),
     actions: {
         setID(id: string){
@@ -26,6 +34,14 @@ export const useCurrentBotStore = defineStore('currentBot', {
         },
         setBotServer(server: string) {
             this.server = server
+        },
+        setFunctions(functions: Record<BotFunctions, toggleInfo>){
+            for (const functionsKey in functions) {
+                this.functions[functionsKey] = functions[functionsKey];
+            }
+        },
+        setFunction(type:BotFunctions, value: toggleInfo){
+            this.functions[type] = value;
         }
     },
 });
