@@ -9,12 +9,13 @@ import { BotInfo } from '../../env/types';
 import CreateBotFeature from '@/features/CreateBotFeature.vue';
 import { useDelay } from '@/hook/useDelay';
 import { Subscribe } from '../../env/helpers/observable';
+import UpdateBotFeature from '@/components/UpdateBotFeature.vue';
 
 const router = useRouter()
 const {isConnect, isNotConnect, reconnect, onConnect} = useBackendConnect()
 const {isValue: isLazyNotConnect} = useDelay(isNotConnect, false)
 
-
+const currentBot = ref(null)
 const botsInfo: Ref<BotInfo[]> = ref([])
 let subscribe:Subscribe
 onMounted(() => {
@@ -34,6 +35,8 @@ onMounted(() => {
 onUnmounted(()=> subscribe.unsubscribe())
 
 const confirmDialogDeleteBot = ref(false)
+const isUpdateBotFeature = ref(false)
+
 const currentDeletedBotInfo:Reactive<{
 	id: string,
 	nickname: string
@@ -60,14 +63,17 @@ async function onAgreeBotDelete(){
 function onDisagreeBotDelete(){
 	confirmDialogDeleteBot.value = false
 }
-
+function onUpdate(bot: BotInfo){
+	currentBot.value = bot
+	isUpdateBotFeature.value = true
+}
+async function submitUpdate(){
+	await updateBotList()
+}
 </script>
 
 <template>
 	<div>
-		<CreateBotFeature
-			@submit="updateBotList"
-		></CreateBotFeature>
 		<ConfirmationDialog
 			:open="confirmDialogDeleteBot"
 			@agree="onAgreeBotDelete"
@@ -75,7 +81,14 @@ function onDisagreeBotDelete(){
 		>
 			Это действие удалит бота {{ currentDeletedBotInfo.nickname }}
 		</ConfirmationDialog>
+		<UpdateBotFeature
+			:open="isUpdateBotFeature"
+			@submit="submitUpdate"
+			@close="isUpdateBotFeature = false"
+			:current-bot="currentBot"
+		></UpdateBotFeature>
 		<BotsList
+			@update="onUpdate"
 			@delete="onBotDelete"
 			@turn="async (data) => {
         const {action, id} = data;
@@ -86,6 +99,7 @@ function onDisagreeBotDelete(){
           console.log(await webSocketBotAPI.turnOff(id))
         }
       }"
+			@create="updateBotList"
 			@select="data => router.push(`/bots/${data.nickname}`)"
 			:skeleton="isLazyNotConnect" :bots="botsInfo">
 		</BotsList>

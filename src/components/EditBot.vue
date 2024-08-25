@@ -7,26 +7,22 @@ import { Label } from '@/components/ui/label';
 import { Select, SelectContent, SelectGroup, SelectItem, SelectTrigger, SelectValue } from '@/components/ui/select';
 import { TagsInput, TagsInputInput, TagsInputItem, TagsInputItemDelete, TagsInputItemText } from '@/components/ui/tags-input'
 import ScriptSelectFeature from '@/features/ScriptSelectFeature.vue';
-import { watch } from 'vue';
-import { AccountModel } from '@/API/types';
-import { BotInfo } from '../../env/types';
 
 type form = {
 	nickname: string;
 	server: string,
 	version: string;
 	port: number,
-	whiteList?: string[]
 	autoReconnectScript: string,
 	autoReconnectTimeout: number
 }
+
 const emit = defineEmits<{
 	(event: 'submit', values: form): void;
 }>();
 
 const props = defineProps<{
-	serverError?: string,
-	defaultForm?: BotInfo
+	serverError?: string
 }>();
 
 const validations = {
@@ -78,18 +74,6 @@ const { value: version, errorMessage: versionError } = useField<string>('version
 const {value: whiteList, errorMessage: whiteListError}= useField<string[]>('whiteList')
 const {value: autoReconnectScript, errorMessage: autoReconnectScriptError}= useField<string>('autoReconnectScript')
 const {value: autoReconnectTimeout, errorMessage: autoReconnectTimeoutError}= useField<number>('autoReconnectTimeout')
-
-const syncProps = ()=>{
-	nickname.value = props.defaultForm?.nickname
-	server.value = props.defaultForm?.server
-	port.value = (props.defaultForm as any)?.port
-	version.value = props.defaultForm?.version
-	whiteList.value = props.defaultForm?.whiteList
-	autoReconnectScript.value = props.defaultForm?.autoReconnect.script
-	autoReconnectTimeout.value = props.defaultForm?.autoReconnect.timeout
-}
-if(props.defaultForm) syncProps()
-watch(()=> props?.defaultForm, syncProps)
 
 
 const onSubmit = handleSubmit((values) => {
@@ -173,15 +157,10 @@ const onSubmit = handleSubmit((values) => {
 			<Label for="reconnectScript">
 				Скрипт реконнекта
 			</Label>
-			<div class="flex items-center gap-2">
-				<ScriptSelectFeature
-					id="reconnectScript"
-					v-model="autoReconnectScript"
-				></ScriptSelectFeature>
-				<button v-if="autoReconnectScript" class="w-6 h-6" @click.prevent="autoReconnectScript = ''">
-					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--!Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M256 48a208 208 0 1 1 0 416 208 208 0 1 1 0-416zm0 464A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM175 175c-9.4 9.4-9.4 24.6 0 33.9l47 47-47 47c-9.4 9.4-9.4 24.6 0 33.9s24.6 9.4 33.9 0l47-47 47 47c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-47-47 47-47c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-47 47-47-47c-9.4-9.4-24.6-9.4-33.9 0z"/></svg>
-				</button>
-			</div>
+			<ScriptSelectFeature
+				id="reconnectScript"
+				v-model="autoReconnectScript"
+			></ScriptSelectFeature>
 			<span class="error">{{ autoReconnectScriptError }}</span>
 		</div>
 		<div class="form">

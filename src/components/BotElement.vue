@@ -7,13 +7,15 @@ import {reactive} from "vue";
 import BotElementSkeleton from "@/view/BotElementSkeleton.vue";
 import {BotInfo} from "../../env/types";
 import {FontAwesomeIcon} from "@fortawesome/vue-fontawesome";
+import UpdateBotFeature from '@/components/UpdateBotFeature.vue';
 
 const props = defineProps<{
   botInfo: BotInfo,
 }>()
 
 const emit = defineEmits<{
-  (e: 'turn', action: 'CONNECT' | 'DISCONNECT'): void
+  (e: 'turn', action: 'CONNECT' | 'DISCONNECT'): void,
+	(e: 'update'): void
   (e: 'delete'): void
 }>()
 
@@ -44,7 +46,7 @@ function onTurn(){
         </DropdownMenuTrigger>
         <DropdownMenuContent>
           <DropdownMenuItem>
-            <button>Настройки</button>
+						<button @click="emit('update')">Настройки</button>
           </DropdownMenuItem>
           <DropdownMenuItem  @click="emit('delete')" class="cursor-pointer">
             <button>Удалить</button>

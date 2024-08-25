@@ -8,15 +8,15 @@ import {
 	DialogTitle,
 	DialogTrigger,
 } from '@/components/ui/dialog';
-import { Button } from '@/components/ui/button';
 import CreateBotBlock from '@/components/CreateBotBlock.vue';
-import { ref } from 'vue';
-import { webSocketBotAPI } from '@/API/WS-BOT-API';
-import { STATUS } from '@/API/types';
+import { onMounted, ref, watch } from 'vue';
 import { interceptServerWithASpecialVersion } from '../../env/helpers/interceptServerWithASpecialVersion';
-
+import { webSocketBotAPI } from '@/API/WS-BOT-API';
+import { AccountModel, STATUS } from '@/API/types';
+import { BotInfo } from '../../env/types';
 const emit = defineEmits<{
-	(e: 'submit')
+	(e: 'submit'),
+	(e: 'close')
 }>();
 
 type form = {
@@ -27,22 +27,28 @@ type form = {
 	autoReconnectScript: string,
 	autoReconnectTimeout: number
 }
+
+const props = defineProps<{
+	currentBot: BotInfo,
+	open?: boolean
+}>()
+watch(()=> props.open, ()=>{
+	dialogIsOpen.value = props.open
+})
+
 const dialogIsOpen = ref(false);
+watch(()=> dialogIsOpen.value, ()=>{
+	if(!dialogIsOpen.value) emit('close')
+})
 const serverError = ref('');
 
-
 async function onSubmit(form: form) {
-	const formatForm: any = interceptServerWithASpecialVersion(form);
-	formatForm.autoReconnect = {
-		enable: false,
-	};
-	if (form.autoReconnectScript || form.autoReconnectScript) {
-		formatForm.autoReconnect.enable = true;
+	const updateDto = {}
+	for (const formKey in form) {
+		if(props.currentBot[formKey] !== form[formKey]) updateDto[formKey] = form[formKey];
 	}
-	formatForm.autoReconnect.script = form.autoReconnectScript || '';
-	formatForm.autoReconnect.timeout = form.autoReconnectTimeout | 5000;
 
-	const response = await webSocketBotAPI.createBot(formatForm);
+	const response = await webSocketBotAPI.updateBotOptions(props.currentBot.id, updateDto);
 	if (response.status !== STATUS.SUCCESS) {
 		serverError.value = response.errorMessage;
 	}
@@ -52,6 +58,7 @@ async function onSubmit(form: form) {
 		dialogIsOpen.value = false;
 	}
 }
+
 </script>
 
 <template>
@@ -61,13 +68,14 @@ async function onSubmit(form: form) {
 		</DialogTrigger>
 		<DialogContent class="max-h-screen  overflow-y-auto">
 			<DialogHeader>
-				<DialogTitle>Создание бота:</DialogTitle>
+				<DialogTitle>Обновление данных бота:</DialogTitle>
 				<DialogDescription>
 					Заполните форму для создание бота.
 				</DialogDescription>
 			</DialogHeader>
 			<CreateBotBlock
 				@submit="values => onSubmit(values)"
+				:default-form="currentBot"
 				:serverError="serverError"
 			></CreateBotBlock>
 		</DialogContent>

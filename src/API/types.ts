@@ -1,4 +1,4 @@
-import { Item } from '../../env/types';
+import { BotActions, BotScript, Item } from '../../env/types';
 import { WindowEvent } from '@/API/WS-BOT-API';
 
 export type standartEvent = 'CONNECT' | 'DISCONNECT' | 'SPAWN'
@@ -21,7 +21,13 @@ export type AccountModel = {
     version: string,
     port: number,
     status: BotStatus
-    profile: string
+    profile: string,
+    whiteList: string[]
+    autoReconnect: {
+        "enable": boolean,
+        "script": string
+        "timeout": number
+    }
 }
 export type toggle = "START" | "STOP"
 
@@ -55,6 +61,7 @@ export type OutgoingCreateBotMessage = OutgoingMessage<{
     version: string,
     whiteList?: string[]
 }>
+
 export type OutgoingDeleteBotMessage = OutgoingMessage
 export type OutgoingUpdateBotOptionsMessage = OutgoingMessage<{
     profile?: string,
@@ -103,6 +110,14 @@ export type OutgoingGotoMessage = OutgoingMessage<{
     y: number,
     z: number
 }>
+export type OutgoingSaveScriptMessage = OutgoingMessage<{
+    actions: BotActions,
+    name: string
+}>
+export type OutgoingDeleteScriptMessage = OutgoingMessage<{
+    scriptId: string
+}>
+export type OutgoingGetScriptsMessage = OutgoingMessage
 export type OutgoingClickWindowMessage = OutgoingMessage<{
     slotIndex: number
     mode: number
@@ -141,6 +156,13 @@ export type IncomingConnecingBotMessage = {
     id: string,
     state: standartEvent
 }
+export type IncomingGetScripts = IncomingReplayMessage<{
+    scripts: BotScript[]
+}>
+export type IncomingDeleteScript = IncomingReplayMessage
+export type IncomingSaveScript = IncomingReplayMessage<{
+    script: BotScript
+}>
 export type IncomingActionWindowBotMessage = WindowEvent & {
     command: INCOMING_COMMAND_LIST.WINDOW
 }
@@ -214,7 +236,10 @@ export enum UNIVERSAL_COMMAND_LIST {
     CLICK_WINDOW = 'CLICK_WINDOW',
     GET_INVENTORY_SLOTS = 'GET_INVENTORY_SLOTS',
     GET_CURRENT_WINDOW = 'GET_CURRENT_WINDOW',
-    ACTIVATE_SLOT = 'ACTIVATE_SLOT'
+    ACTIVATE_SLOT = 'ACTIVATE_SLOT',
+    GET_SCRIPTS = 'GET_SCRIPTS',
+    SAVE_SCRIPT = 'SAVE_SCRIPT',
+    DELETE_SCRIPT = 'DELETE_SCRIPT'
 }
 
 export enum INCOMING_COMMAND_LIST {

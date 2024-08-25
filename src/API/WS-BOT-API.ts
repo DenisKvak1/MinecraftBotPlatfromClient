@@ -8,34 +8,35 @@ import {
     IncomingCaptchaMessage,
     IncomingChatBotMessage,
     IncomingConnecingBotMessage,
-    IncomingCreateBotReplayMessage,
+    IncomingCreateBotReplayMessage, IncomingDeleteScript,
     IncomingGetBotFunctionStatusReplayMessage,
     IncomingGetBotInfoMessage,
     IncomingGetBotsInfoMessage,
-    IncomingGetCurrentWindowReplayMessage,
+    IncomingGetCurrentWindowReplayMessage, IncomingGetScripts,
     IncomingGetSlotsReplayMessage,
     IncomingInventoryUpdateBotMessage,
-    IncomingReplayMessage,
+    IncomingReplayMessage, IncomingSaveScript,
     MovementDirection,
     OutgoingActivateSlotMessage,
     OutgoingAttackMessage,
     OutgoingClickWindowMessage,
     OutgoingConnectBotMessage,
     OutgoingCreateBotMessage,
-    OutgoingDeleteBotMessage,
+    OutgoingDeleteBotMessage, OutgoingDeleteScriptMessage,
     OutgoingDropAllSlotMessage,
     OutgoingDropSlotMessage,
     OutgoingGetBotFunctionsStateMessage,
     OutgoingGetBotInfoIDMessage,
     OutgoingGetBotInfoNameMessage,
     OutgoingGetBotsMessage,
-    OutgoingGetCurrentWindow,
+    OutgoingGetCurrentWindow, OutgoingGetScriptsMessage,
     OutgoingGetSlotsMessage,
     OutgoingGotoMessage,
     OutgoingJumpBotMessage,
     OutgoingMessage,
     OutgoingMovementBotMessage,
     OutgoingRotateHeadMessage,
+    OutgoingSaveScriptMessage,
     OutgoingSendChatMessageMessage,
     OutgoingSetHotBarSlotMessage,
     OutgoingToggleClickerMessage,
@@ -47,7 +48,7 @@ import {
 } from '@/API/types';
 import { Observable } from '../../env/helpers/observable';
 import { BackendURL } from '../../env/config';
-import { Item } from '../../env/types';
+import { BotActions, Item } from '../../env/types';
 
 type pos = {
     x: number,
@@ -255,6 +256,41 @@ export class WebsocketBotApi {
         })
 
         return this.replay(UNIVERSAL_COMMAND_LIST.ACTIVATE_SLOT, id)
+    }
+
+    saveScript(actions: BotActions, name: string): Promise<IncomingSaveScript>{
+        this.send<OutgoingSaveScriptMessage>({
+            botID: '',
+            command: UNIVERSAL_COMMAND_LIST.SAVE_SCRIPT,
+            data: {
+                actions,
+                name
+            }
+        })
+
+        return this.replay(UNIVERSAL_COMMAND_LIST.SAVE_SCRIPT)
+    }
+
+    getAllScripts(): Promise<IncomingGetScripts> {
+        this.send<OutgoingGetScriptsMessage>({
+            botID: '',
+            command: UNIVERSAL_COMMAND_LIST.GET_SCRIPTS
+        })
+
+        return this.replay(UNIVERSAL_COMMAND_LIST.GET_SCRIPTS)
+    }
+
+
+    deleteScript(scriptId: string): Promise<IncomingDeleteScript>{
+        this.send<OutgoingDeleteScriptMessage>({
+            botID: '',
+            command: UNIVERSAL_COMMAND_LIST.DELETE_SCRIPT,
+            data: {
+                scriptId
+            }
+        })
+
+        return this.replay(UNIVERSAL_COMMAND_LIST.DELETE_SCRIPT)
     }
 
     attack(id: string): Promise<IncomingReplayMessage> {

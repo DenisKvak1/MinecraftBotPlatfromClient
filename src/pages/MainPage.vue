@@ -4,6 +4,7 @@ import { useBackendConnect } from '@/proccess/useBackendConnect';
 import LostConnection from '@/components/LostConnection.vue';
 import { useDelay } from '@/hook/useDelay';
 import BotsListFeature from '@/features/BotsListFeature.vue';
+import ScriptEditorModalFeature from '@/features/ScriptEditorModalFeature.vue';
 
 const {isConnect, isNotConnect, reconnect, onConnect} = useBackendConnect()
 const {isValue: isLazyNotConnect} = useDelay(isNotConnect, false)
@@ -13,12 +14,13 @@ const {isValue: isLazyNotConnect} = useDelay(isNotConnect, false)
 
 <template>
   <div>
-		<BotsListFeature></BotsListFeature>
+		<ScriptEditorModalFeature></ScriptEditorModalFeature>
+		<BotsListFeature class="mt-1"></BotsListFeature>
     <LostConnection
         :open="isLazyNotConnect"
         @reconnect="reconnect"
     ></LostConnection>
-  </div>
+	</div>
 </template>
 
 <style scoped>
