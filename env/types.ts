@@ -17,7 +17,7 @@ export type Item = {
 	name: string,
 	count: number,
 	displayName: string,
-
+	slot: number
 	customName?: string
 	customNameHTML?: string,
 	customLoreHTML?: string,
@@ -26,14 +26,18 @@ export type Item = {
 
 export enum BOT_SCRIPT_ACTIONS {
 	GOTO = 'GOTO',
-	SEND_CHAT_MESSAGE = 'SEND_CHAT_MESSAGE',
+	SEND_CHAT_ESSAGE = 'SEND_CHAT_MESSAGE',
+	START_MASS_AUTOBUY = 'START_MASS_AUTOBUY',
+	STOP_MASS_AUTOBUY = 'STOP_MASS_AUTOBUY',
+	ADD_MASS_AUTOBUY_PLAYER = 'ADD_MASS_AUTOBUY_PLAYER',
+	DELETE_MASS_AUTOBUY_PLAYER = 'DELETE_MASS_AUTOBUY_PLAYER',
 	CLICK_WINDOW = 'CLICK_WINDOW',
 	SET_HOTBOR_SLOT = 'SET_HOTBOR_SLOT',
 	ACTIVATE_ITEM = 'ACTIVATE_ITEM',
 	TOGGLE_AUTOBUY = 'TOGGLE_AUTOBUY',
 	TOGGLE_FOOD = 'TOGGLE_FOOD',
 	TOGGLE_FARM = 'TOGGLE_FARM',
-	TOGGLE_ATTACK_CLICKER = 'TOGGLE_ATTACK_CLICKER',
+	TOGGLE_ATTACK_CLICKER ='TOGGLE_ATTACK_CLICKER',
 	TOGGLE_USE_CLICKER = 'TOGGLE_USE_CLICKER',
 	DROP_SLOT = 'DROP_SLOT',
 	SLEEP = 'SLEEP',
@@ -140,6 +144,30 @@ export const BotActionForm = {
 	ATTACK: [],
 	DISCONNECT: [],
 	CONNECT: [],
+	START_MASS_AUTOBUY: [
+		{
+			placeholder: 'Ники игроков',
+			key: 'botsNicknames'
+		},
+	],
+	STOP_MASS_AUTOBUY: [
+		{
+			placeholder: 'id масс автобая',
+			key: 'massId'
+		}
+	],
+	ADD_MASS_AUTOBUY_PLAYER: [
+		{
+			placeholder: 'id масс автобая',
+			key: 'massId'
+		}
+	],
+	DELETE_MASS_AUTOBUY_PLAYER: [
+		{
+			placeholder: 'id масс автобая',
+			key: 'massId'
+		}
+	]
 };
 
 export const BotActionsForm = {
@@ -158,4 +186,8 @@ export const BotActionsForm = {
 	ATTACK: 'Аттака',
 	DISCONNECT: 'Отключить',
 	CONNECT: 'Подключить',
+	START_MASS_AUTOBUY: 'Вкл масс автобай',
+	STOP_MASS_AUTOBUY: 'Выкл масс автобай' ,
+	ADD_MASS_AUTOBUY_PLAYER: '+ бот из AB',
+	DELETE_MASS_AUTOBUY_PLAYER: '- бот из AB'
 };

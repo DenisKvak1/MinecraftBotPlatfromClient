@@ -33,14 +33,15 @@ const serverError = ref('');
 
 async function onSubmit(form: form) {
 	const formatForm: any = interceptServerWithASpecialVersion(form);
-	formatForm.autoReconnect = {
-		enable: false,
-	};
+	formatForm.autoReconnect = {};
 	if (form.autoReconnectScript || form.autoReconnectScript) {
 		formatForm.autoReconnect.enable = true;
 	}
 	formatForm.autoReconnect.script = form.autoReconnectScript || '';
 	formatForm.autoReconnect.timeout = form.autoReconnectTimeout | 5000;
+
+	delete form.autoReconnectScript
+	delete form.autoReconnectTimeout
 
 	const response = await webSocketBotAPI.createBot(formatForm);
 	if (response.status !== STATUS.SUCCESS) {

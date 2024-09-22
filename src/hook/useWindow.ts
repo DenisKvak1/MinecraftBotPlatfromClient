@@ -17,7 +17,10 @@ export const useWindow = (botID: Ref<string>) => {
 	};
 
 	onConnectBot(initSlots);
-	watch(() => botID, initSlots);
+	watch(() => botID, async ()=>{
+		slots.value = []
+		await initSlots()
+	});
 
 	onDisconnectBot(() => {
 		slots.value = [];
@@ -30,7 +33,9 @@ export const useWindow = (botID: Ref<string>) => {
 			slots.value = data.items;
 		}
 		if (data.action === 'UPDATE') {
-			slots.value[data.slotIndex] = data.newItem;
+			data.items.forEach((item) => {
+				slots.value[item.slot] = item;
+			});
 		}
 		if (data.action === 'CLOSE') {
 			slots.value = [];

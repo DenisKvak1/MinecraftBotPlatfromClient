@@ -23,7 +23,10 @@ export const useHotbar = (botID: Ref<string>) => {
 
 
 	onSpawnBot(initSlots);
-	watch(() => botID.value, initSlots);
+	watch(() => botID, async ()=>{
+		slots.value = []
+		await initSlots()
+	});
 
 	onDisconnectBot(() => {
 		slots.value = [];
