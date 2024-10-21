@@ -1,5 +1,5 @@
 import {defineStore} from "pinia";
-import { BotFunctions, BotStatus, toggleInfo } from '@/API/types';
+import { BotFunctions, BotStatus, Experience, toggleInfo } from '@/API/types';
 
 type state = {
     id: string,
@@ -42,6 +42,9 @@ export const useCurrentBotStore = defineStore('currentBot', {
         },
         setFunction(type:BotFunctions, value: toggleInfo){
             this.functions[type] = value;
+        },
+        setExperience(experience: Experience){
+            this.experience = experience
         }
     },
 });

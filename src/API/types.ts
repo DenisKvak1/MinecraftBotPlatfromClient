@@ -2,11 +2,16 @@ import { BotActions, BotScript, Item } from '../../env/types';
 import { WindowEvent } from '@/API/WS-BOT-API';
 
 export type standartEvent = 'CONNECT' | 'DISCONNECT' | 'SPAWN'
-
+export interface Experience {
+    level: number
+    points: number
+    progress: number
+}
 export enum BotStatus {
     CONNECT= "CONNECT",
     DISCONNECT = "DISCONNECT",
 }
+
 export enum BotFunctions {
     AUTO_FARM = "AUTO_FARM",
     AUTO_BUY = "AUTO_BUY",
@@ -47,6 +52,8 @@ export type IncomingReplayMessage<T = any> = {
     errorMessage?: errorMessage
     data?: T
 }
+export type IncomingGetExp = IncomingReplayMessage<Experience>
+
 export type errorMessage = string
 
 export enum STATUS {
@@ -61,6 +68,7 @@ export type OutgoingCreateBotMessage = OutgoingMessage<{
     version: string,
     whiteList?: string[]
 }>
+export type OutgoingGetExp = OutgoingMessage<Experience>
 
 export type OutgoingDeleteBotMessage = OutgoingMessage
 export type OutgoingUpdateBotOptionsMessage = OutgoingMessage<{
@@ -133,6 +141,7 @@ export type OutgoingGetBotInfoNameMessage = OutgoingMessage<{
 export type IncomingGetBotInfoMessage = IncomingReplayMessage<{
     account: AccountModel
 }>
+export type IncomingExperienceEvent = OutgoingMessage<Experience>
 export type IncomingGetBotsInfoMessage = IncomingReplayMessage<{
     accounts: AccountModel[]
 }>
@@ -239,7 +248,8 @@ export enum UNIVERSAL_COMMAND_LIST {
     ACTIVATE_SLOT = 'ACTIVATE_SLOT',
     GET_SCRIPTS = 'GET_SCRIPTS',
     SAVE_SCRIPT = 'SAVE_SCRIPT',
-    DELETE_SCRIPT = 'DELETE_SCRIPT'
+    DELETE_SCRIPT = 'DELETE_SCRIPT',
+    GET_EXP = 'GET_EXP'
 }
 
 export enum INCOMING_COMMAND_LIST {
@@ -251,5 +261,6 @@ export enum INCOMING_COMMAND_LIST {
     INVENTORY_UPDATE = 'INVENTORY_UPDATE',
     BOT_FUNCTIONS_ACTION = 'BOT_FUNCTIONS_ACTION',
     // DAMAGE = 'DAMAGE',
-    DEATH = 'DEATH'
+    DEATH = 'DEATH',
+    EXPERIENCE = 'EXPERIENCE'
 }

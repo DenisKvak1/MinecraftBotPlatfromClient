@@ -28,6 +28,7 @@ export const useLoadBotStore = ()=> {
         currentBotStore.setBotState(botInfoMessage.data.account.status)
         currentBotStore.setBotServer(botInfoMessage.data.account.server)
         currentBotStore.setFunctions(botFunctionsMessage.data.functionsStatus)
+        currentBotStore.setExperience(botInfoMessage.data.experience)
         isLoad.value = true
     }
 

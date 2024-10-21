@@ -17,9 +17,9 @@ export const useWindow = (botID: Ref<string>) => {
 	};
 
 	onConnectBot(initSlots);
-	watch(() => botID, async ()=>{
-		slots.value = []
-		await initSlots()
+	watch(() => botID, async () => {
+		slots.value = [];
+		await initSlots();
 	});
 
 	onDisconnectBot(() => {
@@ -34,6 +34,7 @@ export const useWindow = (botID: Ref<string>) => {
 		}
 		if (data.action === 'UPDATE') {
 			data.items.forEach((item) => {
+				if(item === null) return
 				slots.value[item.slot] = item;
 			});
 		}
