@@ -1,7 +1,7 @@
 import {useCurrentBotStore} from "@/store/currentBotStore";
 import {useRoute, useRouter} from "vue-router";
 import {webSocketBotAPI} from "@/API/WS-BOT-API";
-import { STATUS, toggleInfo } from '@/API/types';
+import {IncomingGetBotInfoMessage, STATUS, toggleInfo} from '@/API/types';
 import { onUnmounted, Ref, ref, watch } from 'vue';
 import {useBackendConnect} from "@/proccess/useBackendConnect";
 import { ToggleToToggleInfo } from '../../env/helpers/toggleToToggleInfo';
@@ -17,8 +17,10 @@ export const useLoadBotStore = ()=> {
     const isLoad = ref(false)
     const subscribes:Subscribe[] = []
 
+    let botInfoMessage: IncomingGetBotInfoMessage;
+
     async function load(){
-        const botInfoMessage = await webSocketBotAPI.getBotByName(botName)
+        botInfoMessage = await webSocketBotAPI.getBotByName(botName);
         if (botInfoMessage.status !== STATUS.SUCCESS) return router.push('/')
 
         const botFunctionsMessage = await webSocketBotAPI.getFunctionsStatus(botInfoMessage.data.account.id)
@@ -28,12 +30,15 @@ export const useLoadBotStore = ()=> {
         currentBotStore.setBotState(botInfoMessage.data.account.status)
         currentBotStore.setBotServer(botInfoMessage.data.account.server)
         currentBotStore.setFunctions(botFunctionsMessage.data.functionsStatus)
-        currentBotStore.setExperience(botInfoMessage.data.experience)
+        // currentBotStore.setExperience(botInfoMessage.data.experience)
+
+        await webSocketBotAPI.subscribeEvents(botInfoMessage.data.account.id)
         isLoad.value = true
     }
 
-    watch(()=> route.params.botName, (newValue: string)=>{
+    watch(()=> route.params.botName,  (newValue: string)=>{
         botName = newValue
+        webSocketBotAPI.unSubscribeEvents(botInfoMessage.botID)
         load()
     })
 
@@ -110,17 +115,12 @@ export const useLoadBot = (botID: Ref<string>) => {
         }
     }
 
-    // Выполняется при первоначальной установке
     onceConnect(() => {
         fetchBotData()
 
-        // Подписка на события
         subscribes.push(webSocketBotAPI.$eventBot.subscribe(handleEvent))
     })
-
-    // Наблюдаем за изменением idRef
     watch(botID, (newId) => {
-        // Обновляем данные при изменении idRef
         fetchBotData()
     })
 

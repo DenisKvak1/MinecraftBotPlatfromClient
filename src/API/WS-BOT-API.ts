@@ -38,9 +38,9 @@ import {
 	OutgoingRotateHeadMessage,
 	OutgoingSaveScriptMessage,
 	OutgoingSendChatMessageMessage,
-	OutgoingSetHotBarSlotMessage,
+	OutgoingSetHotBarSlotMessage, OutgoingSubscribeOnBotEventsMessage,
 	OutgoingToggleClickerMessage,
-	OutgoingToggleFarmMessage,
+	OutgoingToggleFarmMessage, OutgoingUnSubscribeOnBotEventsMessage,
 	OutgoingUpdateBotOptionsMessage,
 	standartEvent,
 	toggle,
@@ -677,6 +677,21 @@ export class WebsocketBotApi {
 		return this.replay(UNIVERSAL_COMMAND_LIST.GET_CURRENT_WINDOW, id);
 	}
 
+	subscribeEvents(botId: string): Promise<IncomingReplayMessage> {
+		this.send<OutgoingSubscribeOnBotEventsMessage>({
+			command: UNIVERSAL_COMMAND_LIST.SUBSCRIBE_EVENTS,
+			botID: botId,
+		});
+		return this.replay(UNIVERSAL_COMMAND_LIST.SUBSCRIBE_EVENTS, botId);
+	}
+
+	unSubscribeEvents(botId: string): Promise<IncomingReplayMessage> {
+		this.send<OutgoingUnSubscribeOnBotEventsMessage>({
+			command: UNIVERSAL_COMMAND_LIST.UNSUBSCRIBE_EVENTS,
+			botID: botId,
+		});
+		return this.replay(UNIVERSAL_COMMAND_LIST.UNSUBSCRIBE_EVENTS, botId);
+	}
 
 	wsReconnect(): Promise<boolean> {
 		this.webSocket.close();

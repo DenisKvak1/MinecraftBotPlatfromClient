@@ -122,6 +122,9 @@ export type OutgoingSaveScriptMessage = OutgoingMessage<{
     actions: BotActions,
     name: string
 }>
+export type OutgoingSubscribeOnBotEventsMessage = OutgoingMessage
+export type OutgoingUnSubscribeOnBotEventsMessage = OutgoingMessage
+
 export type OutgoingDeleteScriptMessage = OutgoingMessage<{
     scriptId: string
 }>
@@ -226,6 +229,8 @@ export enum UNIVERSAL_COMMAND_LIST {
     GET_BOT_ID = 'GET_BOT_ID',
     GET_BOT_NAME = 'GET_BOT_NAME',
     GET_BOTS = 'GET_BOTS',
+    SUBSCRIBE_EVENTS = 'SUBSCRIBE_EVENTS',
+    UNSUBSCRIBE_EVENTS = 'UNSUBSCRIBE_EVENTS',
     UPDATE_BOT_OPTIONS = 'UPDATE_UPDATE_BOT_OPTIONS',
     CONNECT_DISCONNECT_BOT = 'CONNECT_DISCONNECT__BOT',
     SEND_CHAT_MESSAGE = 'SEND_CHAT_MESSAGE',
