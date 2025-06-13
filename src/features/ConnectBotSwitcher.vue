@@ -6,15 +6,17 @@ import { BotStatus } from '@/API/types';
 import { webSocketBotAPI } from '@/API/WS-BOT-API';
 import { onUnmounted, ref, watch } from 'vue';
 import { useBackendConnect } from '@/proccess/useBackendConnect';
+import { useCurrentBotStore } from '@/store/currentBotStore';
 
 const { onConnect } = useBackendConnect();
 const props = defineProps<{
 	botID: string,
 }>();
 const status = ref('');
+const currentBotStore = useCurrentBotStore();
 
 const initToggle = async () => {
-	status.value = (await webSocketBotAPI.getBot(props.botID)).data.account.status;
+	status.value = currentBotStore.state;
 };
 
 onConnect(initToggle);

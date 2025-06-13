@@ -36,7 +36,7 @@ const { isValue: isLazyNotConnect } = useDelay(isNotConnect, false);
 		<div v-if="isLoad" class="p-1.5 container">
 			<header class="flex justify-between mt-3">
 				<ConnectBotSwitcher :bot-i-d="currentBotStore.id"></ConnectBotSwitcher>
-				<BotSwitcher :bot-i-d="currentBotStore.id"></BotSwitcher>
+				<BotSwitcher></BotSwitcher>
 			</header>
 			<div class="myContainer">
 				<BotHeadFeature class="headMove" :bot-i-d="currentBotStore.id"></BotHeadFeature>

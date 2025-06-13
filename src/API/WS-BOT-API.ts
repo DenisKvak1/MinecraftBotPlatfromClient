@@ -62,11 +62,16 @@ export type createBotDTO = {
 	version: string,
 	whiteList?: string[]
 }
-type updateBotDTO = {
+export type updateBotDTO = {
 	profile?: string,
 	server?: string,
 	port?: number,
 	version?: string,
+	autoReconnect?: {
+		'script': string,
+		'timeout': number,
+		'enable': boolean
+	},
 }
 type mainEvent = {
 	id: string,
@@ -398,7 +403,7 @@ export class WebsocketBotApi {
 		return this.replay(UNIVERSAL_COMMAND_LIST.GET_BOTS);
 	}
 
-	getBot(id: string): Promise<IncomingGetBotInfoMessage> {
+	getBotById(id: string): Promise<IncomingGetBotInfoMessage> {
 		this.send<OutgoingGetBotInfoIDMessage>({
 			command: UNIVERSAL_COMMAND_LIST.GET_BOT_ID,
 			botID: id,
