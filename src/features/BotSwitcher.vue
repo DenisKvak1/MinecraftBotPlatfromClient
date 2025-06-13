@@ -9,14 +9,12 @@ import { useCurrentBotStore } from '@/store/currentBotStore';
 
 const {onConnect} = useBackendConnect()
 const router = useRouter()
-const props = defineProps<{
-  botID: string,
-}>()
-const botID = ref(props.botID)
+
 let name = ref('')
+const currentBotStore = useCurrentBotStore();
 
 onConnect(async ()=>{
-  name.value = (await webSocketBotAPI.getBot(botID.value)).data.account.nickname
+  name.value = currentBotStore.name;
 })
 
 const bots:Ref<AccountModel[]> = ref([])

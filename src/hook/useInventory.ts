@@ -6,7 +6,6 @@ import { STATUS } from '@/API/types';
 
 export const useInventory = (botID: Ref<string>) => {
 	const { onSpawnBot, onDisconnectBot } = useLoadBot(botID);
-
 	const slots: Ref<Item[]> = ref([
 		null, null, null, null, null, null, null, null, null,
 		null, null, null, null, null, null, null, null, null,
@@ -19,8 +18,6 @@ export const useInventory = (botID: Ref<string>) => {
 		if (response.botID !== botID.value) return;
 		slots.value = response.data.slots.slice(0, 36)
 	};
-
-
 	onSpawnBot(initSlots);
 	watch(() => botID.value, initSlots);
 

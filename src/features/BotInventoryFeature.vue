@@ -16,7 +16,6 @@ const props = defineProps<{
 const computedBotID = computed(()=> props.botID)
 const { isLoad } = useLoadBot(computedBotID);
 const {slots, dropItem} = useInventory(computedBotID)
-
 </script>
 
 <template>

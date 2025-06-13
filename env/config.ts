@@ -1,4 +1,4 @@
-export const BackendURL = '172.31.42.224:3000'
+export const BackendURL = '217.24.173.143:3000'
 
 export const supportedVersions = [
     "1.20.4", "1.20.3", "1.20.2", "1.20.1", "1.20",
