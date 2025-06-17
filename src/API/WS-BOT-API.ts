@@ -125,6 +125,7 @@ export class WebsocketBotApi {
 	$window = new Observable<WindowEvent>();
 	$functionsEvent = new Observable<farmEvent>();
 	$experience = new Observable<experienceEvent>();
+	$reconnect = new Observable();
 
 	constructor() {
 		this.init();
@@ -701,7 +702,6 @@ export class WebsocketBotApi {
 	wsReconnect(): Promise<boolean> {
 		this.webSocket.close();
 		this.connect();
-
 		this.webSocket.onclose = (event) => setTimeout(() => {
 			if (!event.wasClean) {
 				this.wsReconnect();
@@ -710,6 +710,9 @@ export class WebsocketBotApi {
 
 		return new Promise((resolve) => {
 			this.$ready.once((state) => {
+				if (state) {
+					this.$reconnect.next();
+				}
 				resolve(state);
 			});
 		});

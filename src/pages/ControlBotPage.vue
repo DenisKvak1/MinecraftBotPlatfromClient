@@ -28,7 +28,6 @@ const currentBotStore = useCurrentBotStore();
 const { isNotConnect, reconnect } = useBackendConnect();
 const { isValue: isLazyNotConnect } = useDelay(isNotConnect, false);
 
-
 </script>
 
 <template>
@@ -43,7 +42,7 @@ const { isValue: isLazyNotConnect } = useDelay(isNotConnect, false);
 				<BotWalkFeature class="playerMove" :bot-i-d="currentBotStore.id"></BotWalkFeature>
 				<div class="flex flex-col gap-4">
 					<FarmBotToggler class="farmToggler"></FarmBotToggler>
-					<DropAllFeature  :bot-i-d="currentBotStore.id"></DropAllFeature>
+					<DropAllFeature :bot-i-d="currentBotStore.id"></DropAllFeature>
 				</div>
 				<AutobuyToggle class="AB"></AutobuyToggle>
 
@@ -114,14 +113,17 @@ const { isValue: isLazyNotConnect } = useDelay(isNotConnect, false);
 .headMove {
 	justify-self: start;
 }
+
 .playerMove {
 	justify-self: end;
 }
+
 .farmToggler {
 	grid-row: 5;
 	margin-top: 20px;
 	justify-self: start;
 }
+
 @media (min-width: 1024px) {
 	.myContainer {
 		margin-top: 100px;
@@ -150,7 +152,7 @@ const { isValue: isLazyNotConnect } = useDelay(isNotConnect, false);
 		justify-self: center;
 	}
 
-	.playerMove{
+	.playerMove {
 		align-self: center;
 		grid-column: 4;
 		grid-row: 1 / span 2;
@@ -162,7 +164,7 @@ const { isValue: isLazyNotConnect } = useDelay(isNotConnect, false);
 		grid-row: 1 / span 2;
 	}
 
-	.farmToggler{
+	.farmToggler {
 		grid-column: 1;
 		grid-row: 1;
 		margin-top: 60px;
