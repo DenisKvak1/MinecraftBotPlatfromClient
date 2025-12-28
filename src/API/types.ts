@@ -31,11 +31,19 @@ export type AccountModel = {
 	status: BotStatus
 	profile: string,
 	whiteList: string[]
+	proxyId: string,
 	autoReconnect: {
 		'enable': boolean,
 		'script': string
 		'timeout': number
 	}
+}
+export type Proxy = {
+	id: string,
+	address: string,
+	port: number,
+	username: string,
+	password: string,
 }
 export type toggle = 'START' | 'STOP'
 
@@ -136,6 +144,13 @@ export type OutgoingUnSubscribeOnBotEventsMessage = OutgoingMessage
 export type OutgoingDeleteScriptMessage = OutgoingMessage<{
 	scriptId: string
 }>
+export type OutgoingSaveProxyMessage = OutgoingMessage<{
+	proxy: Proxy
+}>
+export type OutgoingDeleteProxyMessage = OutgoingMessage<{
+	proxyId: string
+}>
+export type OutgoingGetProxyMessage = OutgoingMessage
 export type OutgoingGetScriptsMessage = OutgoingMessage
 export type OutgoingClickWindowMessage = OutgoingMessage<{
 	slotIndex: number
@@ -191,6 +206,17 @@ export type IncomingChatBotMessage = {
 	id: string,
 	message: string
 }
+export type IncomingGetProxies = IncomingReplayMessage<{
+	proxies: Proxy[]
+}>
+export type IncomingGetProxy = IncomingReplayMessage<{
+	proxy: Proxy
+}>
+export type IncomingSaveProxy = IncomingReplayMessage<{
+	proxy: Proxy
+}>
+
+
 export type IncomingGetSlotsReplayMessage = IncomingReplayMessage<{
 	slots?: (Item | null)[]
 	selectedSlot: number
@@ -262,7 +288,14 @@ export enum UNIVERSAL_COMMAND_LIST {
     GET_SCRIPTS = 'GET_SCRIPTS',
     SAVE_SCRIPT = 'SAVE_SCRIPT',
     DELETE_SCRIPT = 'DELETE_SCRIPT',
-    GET_EXP = 'GET_EXP'
+
+		GET_PROXY = 'GET_PROXY',
+		GET_PROXIES = 'GET_PROXIES',
+		SAVE_PROXY = 'SAVE_PROXY',
+		DELETE_PROXY = 'DELETE_PROXY',
+
+
+		GET_EXP = 'GET_EXP'
 }
 
 export enum INCOMING_COMMAND_LIST {

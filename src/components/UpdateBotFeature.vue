@@ -63,7 +63,6 @@ async function onSubmit(form: form) {
 	delete form.autoReconnectTimeout;
 
 
-	console.log(updateDto);
 	const response = await webSocketBotAPI.updateBotOptions(props.currentBot.id, updateDto);
 	if (response.status !== STATUS.SUCCESS) {
 		serverError.value = response.errorMessage;

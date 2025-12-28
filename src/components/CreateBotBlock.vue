@@ -10,6 +10,7 @@ import ScriptSelectFeature from '@/features/ScriptSelectFeature.vue';
 import { watch } from 'vue';
 import { AccountModel } from '@/API/types';
 import { BotInfo } from '../../env/types';
+import ProxyIdSelectFeature from '@/features/ProxyIdSelectFeature.vue';
 
 type form = {
 	nickname: string;
@@ -64,6 +65,10 @@ const validations = {
 	},
 	autoReconnectTimeout: (value: number)=>{
 		return true
+	},
+	proxyId: (value: string)=>{
+
+		return true;
 	}
 };
 
@@ -77,6 +82,7 @@ const { value: port, errorMessage: portError } = useField<number>('port');
 const { value: version, errorMessage: versionError } = useField<string>('version');
 const {value: whiteList, errorMessage: whiteListError}= useField<string[]>('whiteList')
 const {value: autoReconnectScript, errorMessage: autoReconnectScriptError}= useField<string>('autoReconnectScript')
+const {value: proxyId, errorMessage: proxyIdError }= useField<string>('proxyId')
 const {value: autoReconnectTimeout, errorMessage: autoReconnectTimeoutError}= useField<number>('autoReconnectTimeout')
 
 const syncProps = ()=>{
@@ -86,6 +92,7 @@ const syncProps = ()=>{
 	version.value = props.defaultForm?.version
 	whiteList.value = props.defaultForm?.whiteList
 	autoReconnectScript.value = props.defaultForm?.autoReconnect.script
+	proxyId.value = props.defaultForm?.proxyId
 	autoReconnectTimeout.value = props.defaultForm?.autoReconnect.timeout
 }
 if(props.defaultForm) syncProps()
@@ -168,6 +175,21 @@ const onSubmit = handleSubmit((values) => {
 				<TagsInputInput placeholder="Ники..." />
 			</TagsInput>
 			<span class="error">{{ whiteListError }}</span>
+		</div>
+		<div class="form">
+			<Label for="proxyId">
+				Прокси
+			</Label>
+			<div class="flex items-center gap-2">
+				<ProxyIdSelectFeature
+					id="proxyId"
+					v-model="proxyId"
+				></ProxyIdSelectFeature>
+				<button v-if="proxyId" class="w-6 h-6" @click.prevent="proxyId = ''">
+					<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512"><!--!Font Awesome Free 6.6.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free Copyright 2024 Fonticons, Inc.--><path d="M256 48a208 208 0 1 1 0 416 208 208 0 1 1 0-416zm0 464A256 256 0 1 0 256 0a256 256 0 1 0 0 512zM175 175c-9.4 9.4-9.4 24.6 0 33.9l47 47-47 47c-9.4 9.4-9.4 24.6 0 33.9s24.6 9.4 33.9 0l47-47 47 47c9.4 9.4 24.6 9.4 33.9 0s9.4-24.6 0-33.9l-47-47 47-47c9.4-9.4 9.4-24.6 0-33.9s-24.6-9.4-33.9 0l-47 47-47-47c-9.4-9.4-24.6-9.4-33.9 0z"/></svg>
+				</button>
+			</div>
+			<span class="error">{{ proxyIdError }}</span>
 		</div>
 		<div class="form">
 			<Label for="reconnectScript">

@@ -7,6 +7,7 @@ export type BotInfo = {
 	server: string,
 	version: string,
 	whiteList: string[],
+	proxyId: string
 	autoReconnect: {
 		"enable": boolean,
 		"script": string

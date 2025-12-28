@@ -12,17 +12,17 @@ import {
 	IncomingGetBotFunctionStatusReplayMessage,
 	IncomingGetBotInfoMessage,
 	IncomingGetBotsInfoMessage,
-	IncomingGetCurrentWindowReplayMessage, IncomingGetExp, IncomingGetScripts,
+	IncomingGetCurrentWindowReplayMessage, IncomingGetExp, IncomingGetProxies, IncomingGetScripts,
 	IncomingGetSlotsReplayMessage,
 	IncomingInventoryUpdateBotMessage,
-	IncomingReplayMessage, IncomingSaveScript,
+	IncomingReplayMessage, IncomingSaveProxy, IncomingSaveScript,
 	MovementDirection,
 	OutgoingActivateSlotMessage,
 	OutgoingAttackMessage,
 	OutgoingClickWindowMessage,
 	OutgoingConnectBotMessage,
 	OutgoingCreateBotMessage,
-	OutgoingDeleteBotMessage, OutgoingDeleteScriptMessage,
+	OutgoingDeleteBotMessage, OutgoingDeleteProxyMessage, OutgoingDeleteScriptMessage,
 	OutgoingDropAllSlotMessage,
 	OutgoingDropSlotMessage,
 	OutgoingGetBotFunctionsStateMessage,
@@ -35,13 +35,13 @@ import {
 	OutgoingJumpBotMessage,
 	OutgoingMessage,
 	OutgoingMovementBotMessage,
-	OutgoingRotateHeadMessage,
+	OutgoingRotateHeadMessage, OutgoingSaveProxyMessage,
 	OutgoingSaveScriptMessage,
 	OutgoingSendChatMessageMessage,
 	OutgoingSetHotBarSlotMessage, OutgoingSubscribeOnBotEventsMessage,
 	OutgoingToggleClickerMessage,
 	OutgoingToggleFarmMessage, OutgoingUnSubscribeOnBotEventsMessage,
-	OutgoingUpdateBotOptionsMessage,
+	OutgoingUpdateBotOptionsMessage, Proxy,
 	standartEvent,
 	toggle,
 	UNIVERSAL_COMMAND_LIST,
@@ -67,6 +67,7 @@ export type updateBotDTO = {
 	server?: string,
 	port?: number,
 	version?: string,
+	proxyId?:string
 	autoReconnect?: {
 		'script': string,
 		'timeout': number,
@@ -276,6 +277,40 @@ export class WebsocketBotApi {
 			command: UNIVERSAL_COMMAND_LIST.GET_EXP,
 		});
 		return this.replay(UNIVERSAL_COMMAND_LIST.GET_EXP);
+	}
+
+	saveProxy(proxy: Proxy): Promise<IncomingSaveProxy> {
+		this.send<OutgoingSaveProxyMessage>({
+			botID: '',
+			command: UNIVERSAL_COMMAND_LIST.SAVE_PROXY,
+			data: {
+				proxy
+			},
+		});
+
+		return this.replay(UNIVERSAL_COMMAND_LIST.SAVE_SCRIPT);
+	}
+
+	getAllProxies(): Promise<IncomingGetProxies> {
+		this.send<OutgoingGetScriptsMessage>({
+			botID: '',
+			command: UNIVERSAL_COMMAND_LIST.GET_PROXIES,
+		});
+
+		return this.replay(UNIVERSAL_COMMAND_LIST.GET_PROXIES);
+	}
+
+
+	deleteProxy(proxyId: string): Promise<OutgoingDeleteProxyMessage> {
+		this.send<OutgoingDeleteProxyMessage>({
+			botID: '',
+			command: UNIVERSAL_COMMAND_LIST.DELETE_PROXY,
+			data: {
+				proxyId,
+			},
+		});
+
+		return this.replay(UNIVERSAL_COMMAND_LIST.DELETE_SCRIPT);
 	}
 
 	saveScript(actions: BotActions, name: string): Promise<IncomingSaveScript> {
