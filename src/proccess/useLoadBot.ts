@@ -37,15 +37,20 @@ export const useLoadBotStore = () => {
   }
 
   watch(
-    () => route.params.botName,
-    (newValue: string) => {
-      if (botInfoMessage) {
-        webSocketBotAPI.unSubscribeEvents(botInfoMessage.data.account.id);
-      }
-      botName = newValue;
-      load();
-    }
+      () => route.params.botName,
+      (newValue: string) => {
+        if (botInfoMessage) {
+          webSocketBotAPI.unSubscribeEvents(botInfoMessage.data.account.id);
+        }
+        botName = newValue;
+        load();
+      },
   );
+
+  webSocketBotAPI.$reconnect.subscribe(x => {
+    if (!botInfoMessage) return;
+    webSocketBotAPI.subscribeEvents(botInfoMessage.data.account.id);
+  });
 
   if (!botName) {
     router.push('/');
@@ -56,17 +61,17 @@ export const useLoadBotStore = () => {
     load();
 
     subscribes.push(
-      webSocketBotAPI.$eventBot.subscribe((event) => {
-        if (event.state === 'SPAWN') return;
-        if (event.id !== currentBotStore.id) return;
-        currentBotStore.setBotState(event.state as any);
-      })
+        webSocketBotAPI.$eventBot.subscribe((event) => {
+          if (event.state === 'SPAWN') return;
+          if (event.id !== currentBotStore.id) return;
+          currentBotStore.setBotState(event.state as any);
+        }),
     );
 
     subscribes.push(
-      webSocketBotAPI.$functionsEvent.subscribe((event) => {
-        currentBotStore.setFunction(event.type, ToggleToToggleInfo(event.action));
-      })
+        webSocketBotAPI.$functionsEvent.subscribe((event) => {
+          currentBotStore.setFunction(event.type, ToggleToToggleInfo(event.action));
+        }),
     );
   });
 
@@ -81,6 +86,7 @@ export const useLoadBot = (botID: Ref<string>) => {
   const { onceConnect } = useBackendConnect();
   const isLoad = ref(false);
 
+  const store = useCurrentBotStore();
   const subscribes: Subscribe[] = [];
 
   const connectCallbacks: Function[] = [];
@@ -88,14 +94,14 @@ export const useLoadBot = (botID: Ref<string>) => {
   const spawnCallbacks: Function[] = [];
 
   const onConnectBot = (callback: Function) => {
-    if (useCurrentBotStore().state === 'CONNECT') {
+    if (store.state === 'CONNECT') {
       callback();
     }
     connectCallbacks.push(callback);
   };
 
   const onSpawnBot = (callback: Function) => {
-    if (useCurrentBotStore().state === 'CONNECT') {
+    if (store.state === 'CONNECT') {
       callback();
     }
     spawnCallbacks.push(callback);
@@ -106,8 +112,7 @@ export const useLoadBot = (botID: Ref<string>) => {
   };
 
   const fetchBotData = async () => {
-    const botMessage = await webSocketBotAPI.getBot(botID.value);
-    if (botMessage.data.account.status === 'CONNECT') {
+    if (store.state === 'CONNECT') {
       isLoad.value = true;
       connectCallbacks.forEach((callback) => callback());
       spawnCallbacks.forEach((callback) => callback());
